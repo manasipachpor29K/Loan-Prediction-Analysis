@@ -25,73 +25,83 @@ def load_data():
     df['Credit_History'] = df['Credit_History'].fillna(df['Credit_History'].mean())
 
     df['Loan_Status'] = df['Loan_Status'].map({'Y': 1, 'N': 0})
-
     return df
 
 df = load_data()
 
 # ----------------------------
-# Sidebar – User Input
+# Title
 # ----------------------------
-st.sidebar.header("Applicant Details")
-
-name = st.sidebar.text_input("Applicant Name")
-
-gender = st.sidebar.selectbox("Gender", df['Gender'].unique())
-married = st.sidebar.selectbox("Married", df['Married'].unique())
-education = st.sidebar.selectbox("Education", df['Education'].unique())
-self_employed = st.sidebar.selectbox("Self Employed", df['Self_Employed'].unique())
-property_area = st.sidebar.selectbox("Property Area", df['Property_Area'].unique())
-
-dependents = st.sidebar.number_input("Number of Dependents", min_value=0, max_value=5)
-app_income = st.sidebar.number_input("Applicant Income", min_value=0)
-coapp_income = st.sidebar.number_input("Co-applicant Income", min_value=0)
-loan_amount = st.sidebar.number_input("Loan Amount", min_value=0)
-loan_term = st.sidebar.number_input("Loan Amount Term", min_value=0)
-credit_history = st.sidebar.selectbox("Credit History", [0.0, 1.0])
+st.title("🏦 Loan Approval Prediction System")
+st.write("Enter applicant details to check loan eligibility")
 
 # ----------------------------
-# Simple Rule-Based Prediction
+# USER INPUT FORM (FIRST PAGE)
+# ----------------------------
+with st.form("loan_form"):
+    st.subheader("👤 Applicant Details")
+
+    name = st.text_input("Applicant Name")
+    gender = st.selectbox("Gender", df['Gender'].unique())
+    married = st.selectbox("Married", df['Married'].unique())
+    education = st.selectbox("Education", df['Education'].unique())
+    self_employed = st.selectbox("Self Employed", df['Self_Employed'].unique())
+    property_area = st.selectbox("Property Area", df['Property_Area'].unique())
+
+    dependents = st.number_input("Number of Dependents", 0, 5)
+    app_income = st.number_input("Applicant Income", min_value=0)
+    coapp_income = st.number_input("Co-applicant Income", min_value=0)
+    loan_amount = st.number_input("Loan Amount", min_value=0)
+    loan_term = st.number_input("Loan Amount Term", min_value=0)
+    credit_history = st.selectbox("Credit History", [0.0, 1.0])
+
+    submit = st.form_submit_button("Check Loan Status")
+
+# ----------------------------
+# PREDICTION LOGIC
 # ----------------------------
 def predict_loan(ch, income, loan_amt):
     if ch == 1.0 and income > loan_amt:
-        return "Approved"
+        return "✅ Approved"
     else:
-        return "Not Approved"
-
-if st.sidebar.button("Check Loan Status"):
-    result = predict_loan(credit_history, app_income + coapp_income, loan_amount)
-
-    st.success(f"Loan Status for **{name}**: **{result}**")
+        return "❌ Not Approved"
 
 # ----------------------------
-# Main Dashboard
+# SHOW RESULT + DASHBOARD
 # ----------------------------
-st.title("🏦 Loan Approval Analysis Dashboard")
+if submit:
+    total_income = app_income + coapp_income
+    result = predict_loan(credit_history, total_income, loan_amount)
 
-col1, col2 = st.columns(2)
+    st.success(f"**Loan Status for {name}: {result}**")
 
-with col1:
-    st.subheader("Loan Approval Rate by Gender")
+    st.markdown("---")
+    st.header("📊 Loan Approval Insights")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.subheader("Loan Approval by Gender")
+        fig, ax = plt.subplots()
+        sb.barplot(x=df.Gender, y=df.Loan_Status, ax=ax)
+        st.pyplot(fig)
+
+    with col2:
+        st.subheader("Loan Approval by Marital Status")
+        fig, ax = plt.subplots()
+        sb.barplot(x=df.Married, y=df.Loan_Status, ax=ax)
+        st.pyplot(fig)
+
+    st.subheader("Loan Approval by Education")
     fig, ax = plt.subplots()
-    sb.barplot(x=df.Gender, y=df.Loan_Status, ax=ax)
+    sb.barplot(x=df.Education, y=df.Loan_Status, ax=ax)
     st.pyplot(fig)
 
-with col2:
-    st.subheader("Loan Approval Rate by Marital Status")
+    st.subheader("Loan Approval by Property Area")
     fig, ax = plt.subplots()
-    sb.barplot(x=df.Married, y=df.Loan_Status, ax=ax)
+    sb.barplot(x=df.Property_Area, y=df.Loan_Status, ax=ax)
     st.pyplot(fig)
 
-st.subheader("Loan Approval by Education")
-fig, ax = plt.subplots()
-sb.barplot(x=df.Education, y=df.Loan_Status, ax=ax)
-st.pyplot(fig)
+    st.subheader("Correlation Matrix")
+    st.dataframe(df.corr(numeric_only=True))
 
-st.subheader("Loan Approval by Property Area")
-fig, ax = plt.subplots()
-sb.barplot(x=df.Property_Area, y=df.Loan_Status, ax=ax)
-st.pyplot(fig)
-
-st.subheader("Correlation Matrix")
-st.dataframe(df.corr(numeric_only=True))
