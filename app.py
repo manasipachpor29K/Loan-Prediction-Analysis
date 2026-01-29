@@ -8,25 +8,40 @@ import plotly.express as px
 st.set_page_config(page_title="Loan Approval App", layout="wide", page_icon="🏦")
 
 # ----------------------------
-# Dark theme CSS
+# Dark gradient background + hero image container CSS
 # ----------------------------
 st.markdown("""
 <style>
+/* Full-page dark gradient background */
 [data-testid="stAppViewContainer"] {
-    background-color: #121212;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
     color: #E0E0E0;
 }
+
+/* Header dark */
 [data-testid="stHeader"] {
     background-color: #1E1E1E;
 }
+
+/* Buttons */
 .stButton>button {
     background-color: #BB86FC;
     color: black;
 }
+
+/* Card/container style */
 .st-bk {
-    background-color: #1E1E1E !important;
-    padding: 15px;
-    border-radius: 10px;
+    background-color: rgba(30,30,30,0.85) !important;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+/* Centered hero image container */
+.hero-image {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -48,31 +63,31 @@ def load_data():
 df = load_data()
 
 # ----------------------------
-# Session State
+# Session state
 # ----------------------------
 if 'page' not in st.session_state:
     st.session_state.page = 1
 
 # ----------------------------
-# Prediction
+# Prediction logic
 # ----------------------------
 def predict_loan(ch, income, loan_amt):
     return "Approved" if ch == 1.0 and income > loan_amt else "Not Approved"
 
 # ----------------------------
-# PAGE 1 – User Input
+# PAGE 1 – User Input with hero image
 # ----------------------------
 if st.session_state.page == 1:
     st.markdown("<div class='st-bk'>", unsafe_allow_html=True)
     
-    # Center the image using columns
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.image(
-            "https://daxg39y63pxwu.cloudfront.net/images/blog/loan-prediction-using-machine-learning-project-source-code/Loan_Prediction_using__Machine_Learning_Project.webp",
-            use_column_width=True
-        )
-
+    # Hero image centered
+    st.markdown('<div class="hero-image">', unsafe_allow_html=True)
+    st.image(
+        "https://daxg39y63pxwu.cloudfront.net/images/blog/loan-prediction-using-machine-learning-project-source-code/Loan_Prediction_using__Machine_Learning_Project.webp",
+        width=400
+    )
+    st.markdown('</div>', unsafe_allow_html=True)
+    
     st.title("🏦 Loan Application - Step 1")
     st.subheader("Enter Applicant Details")
     
@@ -146,38 +161,4 @@ if st.session_state.page == 2:
 # ----------------------------
 if st.session_state.page == 3:
     st.markdown("<div class='st-bk'>", unsafe_allow_html=True)
-    st.title("📊 Loan Approval Analysis - Step 3")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.subheader("Loan Approval by Gender")
-        fig = px.bar(df.groupby('Gender')['Loan_Status'].mean().reset_index(),
-                     x='Gender', y='Loan_Status', color='Loan_Status',
-                     color_continuous_scale='Viridis', labels={'Loan_Status': 'Approval Rate'})
-        st.plotly_chart(fig, use_container_width=True)
-
-    with col2:
-        st.subheader("Loan Approval by Marital Status")
-        fig = px.bar(df.groupby('Married')['Loan_Status'].mean().reset_index(),
-                     x='Married', y='Loan_Status', color='Loan_Status',
-                     color_continuous_scale='Viridis', labels={'Loan_Status': 'Approval Rate'})
-        st.plotly_chart(fig, use_container_width=True)
-
-    st.subheader("Loan Approval by Education")
-    fig = px.bar(df.groupby('Education')['Loan_Status'].mean().reset_index(),
-                 x='Education', y='Loan_Status', color='Loan_Status',
-                 color_continuous_scale='Viridis', labels={'Loan_Status': 'Approval Rate'})
-    st.plotly_chart(fig, use_container_width=True)
-
-    st.subheader("Loan Approval by Property Area")
-    fig = px.bar(df.groupby('Property_Area')['Loan_Status'].mean().reset_index(),
-                 x='Property_Area', y='Loan_Status', color='Loan_Status',
-                 color_continuous_scale='Viridis', labels={'Loan_Status': 'Approval Rate'})
-    st.plotly_chart(fig, use_container_width=True)
-
-    if st.button("⬅️ Back to Summary"):
-        st.session_state.page = 2
-        st.rerun()
-    st.markdown("</div>", unsafe_allow_html=True)
-
+    st.title("📊 L
