@@ -13,15 +13,17 @@ st.set_page_config(page_title="Loan Approval App", layout="wide")
 def load_data():
     df = pd.read_csv("LP_Train.csv")
 
+    # Clean Dependents column
     df['Dependents'] = df['Dependents'].replace(r'\+', '', regex=True)
     df['Dependents'] = df['Dependents'].fillna(0).astype(int)
 
+    # Fill missing values
     df['Gender'] = df['Gender'].fillna('Male')
     df['Married'] = df['Married'].fillna('Yes')
-
     df['LoanAmount'] = df['LoanAmount'].fillna(df['LoanAmount'].mean())
     df['Credit_History'] = df['Credit_History'].fillna(df['Credit_History'].mean())
 
+    # Map target
     df['Loan_Status'] = df['Loan_Status'].map({'Y': 1, 'N': 0})
     return df
 
@@ -98,6 +100,13 @@ if st.session_state.page == 2:
         st.success("🎉 Loan Approved")
     else:
         st.error("❌ Loan Not Approved")
+        st.info(
+            "💡 Tips to increase approval chances:\n"
+            "- Maintain a **good credit history** (Credit History = 1).\n"
+            "- Ensure **Applicant Income > Loan Amount**.\n"
+            "- Reduce **Loan Amount** requested if possible.\n"
+            "- Keep dependents and debt manageable."
+        )
 
     col1, col2 = st.columns(2)
     with col1:
@@ -115,30 +124,38 @@ if st.session_state.page == 2:
 if st.session_state.page == 3:
     st.title("📊 Loan Approval Analysis – Step 3")
 
+    # Seaborn color palette
+    palette = sb.color_palette("pastel")
+
     col1, col2 = st.columns(2)
 
     with col1:
         st.subheader("Loan Approval by Gender")
-        fig, ax = plt.subplots()
-        sb.barplot(x=df.Gender, y=df.Loan_Status, ax=ax)
+        fig, ax = plt.subplots(figsize=(5, 4))
+        sb.barplot(x=df.Gender, y=df.Loan_Status, ax=ax, palette=palette)
+        ax.set_ylabel("Approval Rate")
         st.pyplot(fig)
 
     with col2:
         st.subheader("Loan Approval by Marital Status")
-        fig, ax = plt.subplots()
-        sb.barplot(x=df.Married, y=df.Loan_Status, ax=ax)
+        fig, ax = plt.subplots(figsize=(5, 4))
+        sb.barplot(x=df.Married, y=df.Loan_Status, ax=ax, palette=palette)
+        ax.set_ylabel("Approval Rate")
         st.pyplot(fig)
 
     st.subheader("Loan Approval by Education")
-    fig, ax = plt.subplots()
-    sb.barplot(x=df.Education, y=df.Loan_Status, ax=ax)
+    fig, ax = plt.subplots(figsize=(5, 4))
+    sb.barplot(x=df.Education, y=df.Loan_Status, ax=ax, palette=palette)
+    ax.set_ylabel("Approval Rate")
     st.pyplot(fig)
 
     st.subheader("Loan Approval by Property Area")
-    fig, ax = plt.subplots()
-    sb.barplot(x=df.Property_Area, y=df.Loan_Status, ax=ax)
+    fig, ax = plt.subplots(figsize=(5, 4))
+    sb.barplot(x=df.Property_Area, y=df.Loan_Status, ax=ax, palette=palette)
+    ax.set_ylabel("Approval Rate")
     st.pyplot(fig)
 
     if st.button("⬅️ Back to Summary"):
         st.session_state.page = 2
         st.rerun()
+
