@@ -8,7 +8,7 @@ import plotly.express as px
 st.set_page_config(page_title="Loan Approval App", layout="wide", page_icon="🏦")
 
 # ----------------------------
-# CSS for dark theme and black inputs with white text
+# CSS for black inputs with white text & light dark theme
 # ----------------------------
 st.markdown("""
 <style>
@@ -55,7 +55,7 @@ st.markdown("""
     font-size: 36px;
 }
 
-/* Form input fields: black background, white text */
+/* Form input fields: black background, white text typed by user */
 .stTextInput>div>input, 
 .stNumberInput>div>input,
 .stSelectbox>div>div,
@@ -104,12 +104,12 @@ def predict_loan(ch, income, loan_amt):
     return "Approved" if ch == 1.0 and income > loan_amt else "Not Approved"
 
 # ----------------------------
-# PAGE 1 – User Input with right-side image
+# PAGE 1 – User Input
 # ----------------------------
 if st.session_state.page == 1:
     st.markdown("<div class='st-bk'>", unsafe_allow_html=True)
     
-    # Top black banner with title
+    # Top banner title
     st.markdown("""
     <div class="top-title-box">
         <h1>Loan Approval Prediction Analysis</h1>
@@ -147,4 +147,12 @@ if st.session_state.page == 1:
                 'Credit History': credit_history
             }
             st.session_state.page = 2
-            st
+            st.rerun()
+    
+    with col2:
+        st.image(
+            "https://daxg39y63pxwu.cloudfront.net/images/blog/loan-prediction-using-machine-learning-project-source-code/Loan_Prediction_using__Machine_Learning_Project.webp",
+            width=250
+        )
+
+    st.markdown("</div>", unsafe_allow_html=True)
