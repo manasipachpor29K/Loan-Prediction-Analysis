@@ -161,5 +161,5 @@ if st.session_state.page == 2:
 # ----------------------------
 if st.session_state.page == 3:
     st.markdown("<div class='st-bk'>", unsafe_allow_html=True)
-    st.title("📊 st.title("📊 Loan Approval Analysis - Step 3")
+    st.title("📊 Loan Approval Analysis - Step 3")
 
