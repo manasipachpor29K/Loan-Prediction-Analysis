@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="Loan Approval App", layout="wide")
 
+
 # ----------------------------
 # Set Background Image
 # ----------------------------
@@ -13,10 +14,17 @@ def set_bg_image():
     st.markdown(
         f"""
         <style>
-        .stApp {{
-            background-image: url("https://images.unsplash.com/photo-1591696331110-32b961fb2a4b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxMTc3M3wwfDF8c2VhcmNofDEwfHxsb2FuJTIwYXBwbGljYXRpb258ZW58MHx8fHwxNjg4Njk1MTY1&ixlib=rb-4.0.3&q=80&w=1080");
+        /* Target the main app background */
+        [data-testid="stAppViewContainer"] {{
+            background-image: url("https://images.unsplash.com/photo-1581091215364-9c6b0e2f2e64?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080");
             background-size: cover;
+            background-position: center;
             background-attachment: fixed;
+        }}
+
+        /* Optional: set container opacity so text is readable */
+        [data-testid="stAppViewContainer"] > .main {{
+            background-color: rgba(255, 255, 255, 0.8);
         }}
         </style>
         """,
