@@ -8,7 +8,7 @@ import plotly.express as px
 st.set_page_config(page_title="Loan Approval App", layout="wide", page_icon="🏦")
 
 # ----------------------------
-# Dark gradient background + hero image container CSS
+# CSS for dark theme and styling
 # ----------------------------
 st.markdown("""
 <style>
@@ -27,6 +27,7 @@ st.markdown("""
 .stButton>button {
     background-color: #BB86FC;
     color: black;
+    font-weight: bold;
 }
 
 /* Card/container style */
@@ -37,17 +38,23 @@ st.markdown("""
     margin-bottom: 20px;
 }
 
-/* Centered hero image container */
+/* Hero image centered */
 .hero-image {
     display: flex;
     justify-content: center;
     margin-bottom: 20px;
 }
+
+/* Center form */
+.form-center {
+    display: flex;
+    justify-content: center;
+}
 </style>
 """, unsafe_allow_html=True)
 
 # ----------------------------
-# Load data
+# Load CSV data
 # ----------------------------
 @st.cache_data
 def load_data():
@@ -69,40 +76,45 @@ if 'page' not in st.session_state:
     st.session_state.page = 1
 
 # ----------------------------
-# Prediction logic
+# Prediction function
 # ----------------------------
 def predict_loan(ch, income, loan_amt):
     return "Approved" if ch == 1.0 and income > loan_amt else "Not Approved"
 
 # ----------------------------
-# PAGE 1 – User Input with hero image
+# PAGE 1 – User Input
 # ----------------------------
 if st.session_state.page == 1:
     st.markdown("<div class='st-bk'>", unsafe_allow_html=True)
     
-    # Hero image centered
+    # Center hero image
     st.markdown('<div class="hero-image">', unsafe_allow_html=True)
     st.image(
         "https://daxg39y63pxwu.cloudfront.net/images/blog/loan-prediction-using-machine-learning-project-source-code/Loan_Prediction_using__Machine_Learning_Project.webp",
-        width=400
+        width=350
     )
     st.markdown('</div>', unsafe_allow_html=True)
-    
+
     st.title("🏦 Loan Application - Step 1")
     st.subheader("Enter Applicant Details")
-    
+
+    # Center the form
     with st.form("loan_form"):
-        name = st.text_input("Name", help="Enter applicant's full name")
-        gender = st.selectbox("Gender", df['Gender'].unique())
-        married = st.selectbox("Married", df['Married'].unique())
-        education = st.selectbox("Education", df['Education'].unique())
-        property_area = st.selectbox("Property Area", df['Property_Area'].unique())
-        dependents = st.slider("Number of Dependents", 0, 5)
-        applicant_income = st.number_input("Applicant Income", min_value=0, step=500)
-        loan_amount = st.number_input("Loan Amount", min_value=0, step=1000)
-        credit_history = st.radio("Credit History", [0.0, 1.0], format_func=lambda x: "Good" if x==1.0 else "Bad")
+        col1, col2 = st.columns([1,1])
+        with col1:
+            name = st.text_input("Name")
+            gender = st.selectbox("Gender", df['Gender'].unique())
+            married = st.selectbox("Married", df['Married'].unique())
+            education = st.selectbox("Education", df['Education'].unique())
+        with col2:
+            property_area = st.selectbox("Property Area", df['Property_Area'].unique())
+            dependents = st.slider("Number of Dependents", 0, 5)
+            applicant_income = st.number_input("Applicant Income", min_value=0, step=500)
+            loan_amount = st.number_input("Loan Amount", min_value=0, step=1000)
+            credit_history = st.radio("Credit History", [0.0, 1.0], format_func=lambda x: "Good" if x==1.0 else "Bad")
+        
         next_btn = st.form_submit_button("Next ➡️")
-    
+
     if next_btn:
         st.session_state.user_data = {
             'Name': name,
@@ -117,7 +129,7 @@ if st.session_state.page == 1:
         }
         st.session_state.page = 2
         st.rerun()
-    
+
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ----------------------------
@@ -139,10 +151,10 @@ if st.session_state.page == 2:
         st.error("❌ Loan Not Approved")
         st.info(
             "💡 Tips:\n"
-            "- Maintain a **good credit history**.\n"
-            "- Applicant Income > Loan Amount.\n"
-            "- Reduce requested Loan Amount.\n"
-            "- Manage dependents/debts."
+            "- Maintain a good credit history\n"
+            "- Applicant Income > Loan Amount\n"
+            "- Reduce requested Loan Amount\n"
+            "- Manage dependents/debts"
         )
 
     col1, col2 = st.columns(2)
@@ -154,12 +166,47 @@ if st.session_state.page == 2:
         if st.button("View Analysis ➡️"):
             st.session_state.page = 3
             st.rerun()
+
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ----------------------------
-# PAGE 3 – Dashboard
+# PAGE 3 – Dashboard / Analysis
 # ----------------------------
 if st.session_state.page == 3:
     st.markdown("<div class='st-bk'>", unsafe_allow_html=True)
-    st.title("📊 Loan Approval Analysis - Step 3")
+    st.title("📊 Loan Approval Analysis")
+
+    view_option = st.radio("Choose view:", ["Data Table", "Graphs"])
+
+    if view_option == "Data Table":
+        st.dataframe(df)
+    else:
+        st.subheader("Loan Approval by Gender")
+        fig = px.bar(df.groupby('Gender')['Loan_Status'].mean().reset_index(),
+                     x='Gender', y='Loan_Status', color='Loan_Status',
+                     color_continuous_scale='Viridis', labels={'Loan_Status': 'Approval Rate'})
+        st.plotly_chart(fig, use_container_width=True)
+
+        st.subheader("Loan Approval by Marital Status")
+        fig = px.bar(df.groupby('Married')['Loan_Status'].mean().reset_index(),
+                     x='Married', y='Loan_Status', color='Loan_Status',
+                     color_continuous_scale='Viridis', labels={'Loan_Status': 'Approval Rate'})
+        st.plotly_chart(fig, use_container_width=True)
+
+        st.subheader("Loan Approval by Education")
+        fig = px.bar(df.groupby('Education')['Loan_Status'].mean().reset_index(),
+                     x='Education', y='Loan_Status', color='Loan_Status',
+                     color_continuous_scale='Viridis', labels={'Loan_Status': 'Approval Rate'})
+        st.plotly_chart(fig, use_container_width=True)
+
+        st.subheader("Loan Approval by Property Area")
+        fig = px.bar(df.groupby('Property_Area')['Loan_Status'].mean().reset_index(),
+                     x='Property_Area', y='Loan_Status', color='Loan_Status',
+                     color_continuous_scale='Viridis', labels={'Loan_Status': 'Approval Rate'})
+        st.plotly_chart(fig, use_container_width=True)
+
+    if st.button("⬅️ Back to Summary"):
+        st.session_state.page = 2
+        st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
 
