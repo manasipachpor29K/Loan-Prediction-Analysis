@@ -57,4 +57,4 @@ if st.session_state.page == 1:
 
     with st.form("loan_form"):
         name = st.text_input("Applicant Name")
-        gender = st.selectbox("Gender", df['Gende]()
+        gender = st.selectbox("Gender", df['Gender]()
