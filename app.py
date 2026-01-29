@@ -8,19 +8,19 @@ import plotly.express as px
 st.set_page_config(page_title="Loan Approval App", layout="wide", page_icon="🏦")
 
 # ----------------------------
-# CSS for dark theme and styling
+# CSS for lighter dark theme, form styles, top banner, right image
 # ----------------------------
 st.markdown("""
 <style>
-/* Full-page dark gradient background */
+/* Lighter dark gradient background */
 [data-testid="stAppViewContainer"] {
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    background: linear-gradient(135deg, #1c1c1c, #2c2c2c, #3a3a3a);
     color: #E0E0E0;
 }
 
 /* Header dark */
 [data-testid="stHeader"] {
-    background-color: #1E1E1E;
+    background-color: #222222;
 }
 
 /* Buttons */
@@ -32,7 +32,7 @@ st.markdown("""
 
 /* Card/container style */
 .st-bk {
-    background-color: rgba(30,30,30,0.85) !important;
+    background-color: rgba(40,40,40,0.9) !important;
     padding: 20px;
     border-radius: 15px;
     margin-bottom: 20px;
@@ -55,23 +55,17 @@ st.markdown("""
     font-size: 36px;
 }
 
-/* White form labels and inputs */
+/* Form inputs: white background, black text */
 .stTextInput>div>input, .stNumberInput>div>input, .stSelectbox>div>div, .stSlider>div>div, .stRadio>div>label {
-    color: white !important;
-    background-color: #1E1E1E !important;
+    color: black !important;
+    background-color: white !important;
+    border-radius: 5px;
 }
 
-/* Input label text */
+/* Input labels: white */
 .css-1aumxhk, label {
     color: white !important;
     font-weight: bold;
-}
-
-/* Center hero image if needed */
-.hero-image {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -105,7 +99,7 @@ def predict_loan(ch, income, loan_amt):
     return "Approved" if ch == 1.0 and income > loan_amt else "Not Approved"
 
 # ----------------------------
-# PAGE 1 – User Input with right-side image
+# PAGE 1 – User Input
 # ----------------------------
 if st.session_state.page == 1:
     st.markdown("<div class='st-bk'>", unsafe_allow_html=True)
@@ -165,3 +159,73 @@ if st.session_state.page == 2:
     st.markdown("<div class='st-bk'>", unsafe_allow_html=True)
     st.title("📄 Applicant Summary - Step 2")
 
+    user = st.session_state.user_data
+    result = predict_loan(user['Credit History'], user['Applicant Income'], user['Loan Amount'])
+
+    st.subheader("Entered Details")
+    st.table(pd.DataFrame(user.items(), columns=["Field", "Value"]))
+
+    if result == "Approved":
+        st.success("🎉 Loan Approved")
+    else:
+        st.error("❌ Loan Not Approved")
+        st.info(
+            "💡 Tips:\n"
+            "- Maintain a good credit history\n"
+            "- Applicant Income > Loan Amount\n"
+            "- Reduce requested Loan Amount\n"
+            "- Manage dependents/debts"
+        )
+
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("⬅️ Back"):
+            st.session_state.page = 1
+            st.rerun()
+    with col2:
+        if st.button("View Analysis ➡️"):
+            st.session_state.page = 3
+            st.rerun()
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ----------------------------
+# PAGE 3 – Dashboard / Analysis
+# ----------------------------
+if st.session_state.page == 3:
+    st.markdown("<div class='st-bk'>", unsafe_allow_html=True)
+    st.title("📊 Loan Approval Analysis")
+
+    view_option = st.radio("Choose view:", ["Data Table", "Graphs"])
+
+    if view_option == "Data Table":
+        st.dataframe(df)
+    else:
+        st.subheader("Loan Approval by Gender")
+        fig = px.bar(df.groupby('Gender')['Loan_Status'].mean().reset_index(),
+                     x='Gender', y='Loan_Status', color='Loan_Status',
+                     color_continuous_scale='Viridis', labels={'Loan_Status': 'Approval Rate'})
+        st.plotly_chart(fig, use_container_width=True)
+
+        st.subheader("Loan Approval by Marital Status")
+        fig = px.bar(df.groupby('Married')['Loan_Status'].mean().reset_index(),
+                     x='Married', y='Loan_Status', color='Loan_Status',
+                     color_continuous_scale='Viridis', labels={'Loan_Status': 'Approval Rate'})
+        st.plotly_chart(fig, use_container_width=True)
+
+        st.subheader("Loan Approval by Education")
+        fig = px.bar(df.groupby('Education')['Loan_Status'].mean().reset_index(),
+                     x='Education', y='Loan_Status', color='Loan_Status',
+                     color_continuous_scale='Viridis', labels={'Loan_Status': 'Approval Rate'})
+        st.plotly_chart(fig, use_container_width=True)
+
+        st.subheader("Loan Approval by Property Area")
+        fig = px.bar(df.groupby('Property_Area')['Loan_Status'].mean().reset_index(),
+                     x='Property_Area', y='Loan_Status', color='Loan_Status',
+                     color_continuous_scale='Viridis', labels={'Loan_Status': 'Approval Rate'})
+        st.plotly_chart(fig, use_container_width=True)
+
+    if st.button("⬅️ Back to Summary"):
+        st.session_state.page = 2
+        st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
