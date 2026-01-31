@@ -2,7 +2,10 @@ import streamlit as st
 import pandas as pd
 
 # ---------------- PAGE CONFIG ----------------
-st.set_page_config(page_title="Loan Approval Prediction Analysis", layout="wide")
+st.set_page_config(
+    page_title="Loan Approval Prediction Analysis",
+    layout="wide"
+)
 
 # ---------------- CSS ----------------
 st.markdown("""
@@ -30,9 +33,8 @@ st.markdown("""
     text-align: center;
     font-size: 42px;
     font-weight: 800;
-    color: #ffffff;
-    margin-top: 10px;
-    margin-bottom: 30px;
+    color: white;
+    margin: 20px 0 30px 0;
 }
 
 .card {
@@ -66,33 +68,26 @@ st.markdown("""
 .stSuccess {
     background-color: #ecfdf5 !important;
     color: #065f46 !important;
-    border-radius: 10px;
 }
 
 .stError {
     background-color: #fef2f2 !important;
     color: #7f1d1d !important;
-    border-radius: 10px;
 }
 
 .stInfo {
     background-color: #eff6ff !important;
     color: #1e3a8a !important;
-    border-radius: 10px;
-}
-
-.stTextInput input,
-.stSelectbox select,
-.stNumberInput input {
-    background-color: #ffffff !important;
-    color: #000000 !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
 # ---------------- SIDEBAR ----------------
 st.sidebar.title("🏦 Loan Dashboard")
-page = st.sidebar.radio("Navigation", ["Applicant Form", "Summary", "Analytics"])
+page = st.sidebar.radio(
+    "Navigation",
+    ["Applicant Form", "Summary", "Analytics"]
+)
 
 # ---------------- DATA ----------------
 df = pd.DataFrame({
@@ -106,37 +101,81 @@ def predict_loan(credit_history, income, loan):
         return "Approved"
     return "Rejected"
 
-# ================= PAGE 1 =================
+# ---------------- APPLICANT FORM ----------------
 if page == "Applicant Form":
 
-    st.markdown("<div class='main-title'>Loan Approval Prediction Analysis</div>", unsafe_allow_html=True)
+    st.markdown(
+        "<div class='main-title'>Loan Approval Prediction Analysis</div>",
+        unsafe_allow_html=True
+    )
 
     st.markdown("<div class='card'>", unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
 
     with col1:
-        name = st.text_input("Applicant Name")
-        gender = st.selectbox("Gender", df["Gender"])
+        st.text_input("Applicant Name")
+        st.selectbox("Gender", df["Gender"])
         credit_history = st.selectbox("Credit History (1 = Good, 0 = Bad)", [1, 0])
 
     with col2:
-        married = st.selectbox("Married", df["Married"])
+        st.selectbox("Married", df["Married"])
         income = st.number_input("Applicant Income", min_value=0)
         loan = st.number_input("Loan Amount", min_value=0)
 
     if st.button("🔍 Predict Loan"):
-    result = predict_loan(credit_history, income, loan)
-    st.session_state["result"] = result
+        result = predict_loan(credit_history, income, loan)
+        st.session_state["result"] = result
 
-    if result == "Approved":
-        st.success("🎉 Loan Approved Successfully!")
+        if result == "Approved":
+            st.success("🎉 Loan Approved Successfully!")
+        else:
+            st.error("❌ Loan Rejected")
+            st.info(
+                "How to improve approval chances:\n"
+                "• Maintain good credit score\n"
+                "• Increase income\n"
+                "• Reduce loan amount\n"
+                "• Avoid multiple loan requests"
+            )
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ---------------- SUMMARY ----------------
+elif page == "Summary":
+
+    st.markdown(
+        "<div class='main-title'>Loan Summary</div>",
+        unsafe_allow_html=True
+    )
+
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+
+    if "result" in st.session_state:
+        if st.session_state["result"] == "Approved":
+            st.markdown(
+                "<div class='badge-success'>🎉 Congratulations! Your Loan is Approved</div>",
+                unsafe_allow_html=True
+            )
+        else:
+            st.markdown(
+                "<div class='badge-danger'>❌ Sorry! Your Loan is Rejected</div>",
+                unsafe_allow_html=True
+            )
     else:
-        st.error("❌ Loan Rejected")
-        st.info(
-            "How to improve approval chances:\n"
-            "• Maintain good credit score\n"
-            "• Increase income\n"
-            "• Reduce loan amount\n"
-            "• Avoid multiple loan requests"
-        )
+        st.warning("Please submit the applicant form first.")
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ---------------- ANALYTICS ----------------
+elif page == "Analytics":
+
+    st.markdown(
+        "<div class='main-title'>Loan Analytics</div>",
+        unsafe_allow_html=True
+    )
+
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.dataframe(df)
+    st.markdown("</div>", unsafe_allow_html=True)
+
