@@ -90,7 +90,7 @@ def predict_loan(credit_history, income, loan):
     else:
         return "Rejected"
 
-# ---------------- PAGE 1 ----------------
+# ---------------- PAGE 1: APPLICANT FORM ----------------
 if page == "Applicant Form":
 
     st.title("Loan Approval Prediction Analysis")
@@ -135,7 +135,7 @@ if page == "Applicant Form":
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-# ---------------- PAGE 2 ----------------
+# ---------------- PAGE 2: SUMMARY ----------------
 elif page == "Summary":
 
     st.title("📄 Loan Summary")
@@ -150,4 +150,28 @@ elif page == "Summary":
     st.markdown("<div class='card'>", unsafe_allow_html=True)
 
     if "result" in st.session_state:
+        if st.session_state.result == "Approved":
+            st.markdown(
+                "<div class='badge-success'>🎉 Congratulations! Loan Approved</div>",
+                unsafe_allow_html=True
+            )
+        else:
+            st.markdown(
+                "<div class='badge-danger'>❌ Loan Rejected</div>",
+                unsafe_allow_html=True
+            )
+    else:
+        st.warning("Please submit the applicant form first.")
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ---------------- PAGE 3: ANALYTICS ----------------
+elif page == "Analytics":
+
+    st.title("📊 Loan Analytics")
+
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.write("Sample Dataset")
+    st.dataframe(df)
+    st.markdown("</div>", unsafe_allow_html=True)
 
