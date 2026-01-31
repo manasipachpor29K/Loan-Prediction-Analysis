@@ -149,4 +149,5 @@ elif page == "Summary":
 
     st.markdown("<div class='card'>", unsafe_allow_html=True)
 
-    if "result" i
+    if "result" in st.session_state:
+
