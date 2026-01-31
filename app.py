@@ -1,14 +1,60 @@
 import streamlit as st
-import numpy as np
 import pandas as pd
-import seaborn as sb
-import matplotlib.pyplot as plt
+import plotly.express as px
 
-st.set_page_config(page_title="Loan Approval App", layout="wide")
+# ---------------------------------------------------
+# PAGE CONFIG
+# ---------------------------------------------------
+st.set_page_config(
+    page_title="Loan Approval Dashboard",
+    page_icon="🏦",
+    layout="wide"
+)
 
-# ----------------------------
-# Load and preprocess data
-# ----------------------------
+# ---------------------------------------------------
+# CUSTOM CSS
+# ---------------------------------------------------
+st.markdown("""
+<style>
+.main {
+    background-color: #f5f7fb;
+}
+.card {
+    background-color: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+.metric-card {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    padding: 20px;
+    border-radius: 15px;
+    color: white;
+    text-align: center;
+}
+.badge-success {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: bold;
+    text-align: center;
+}
+.badge-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: bold;
+    text-align: center;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# ---------------------------------------------------
+# LOAD DATA
+# ---------------------------------------------------
 @st.cache_data
 def load_data():
     df = pd.read_csv("LP_Train.csv")
@@ -20,138 +66,143 @@ def load_data():
     df['Married'] = df['Married'].fillna('Yes')
 
     df['LoanAmount'] = df['LoanAmount'].fillna(df['LoanAmount'].mean())
-    df['Credit_History'] = df['Credit_History'].fillna(df['Credit_History'].mean())
+    df['Credit_History'] = df['Credit_History'].fillna(1.0)
 
     df['Loan_Status'] = df['Loan_Status'].map({'Y': 1, 'N': 0})
+
     return df
 
 df = load_data()
 
-# ----------------------------
-# Session State
-# ----------------------------
-if 'page' not in st.session_state:
-    st.session_state.page = 1
-
-# ----------------------------
-# Prediction Logic
-# ----------------------------
-def predict_loan(ch, income, loan_amt):
-    if ch == 1.0 and income > loan_amt:
+# ---------------------------------------------------
+# SIMPLE PREDICTION LOGIC
+# ---------------------------------------------------
+def predict_loan(credit_history, income, loan_amount):
+    if credit_history == 1.0 and income > loan_amount:
         return "Approved"
     else:
-        return "Not Approved"
+        return "Rejected"
 
-# ----------------------------
-# PAGE 1 – USER INPUT
-# ----------------------------
-if st.session_state.page == 1:
-    st.title("🏦 Loan Approval Prediction Analysis")
-    st.subheader("Enter Applicant Details")
+# ---------------------------------------------------
+# SIDEBAR NAVIGATION
+# ---------------------------------------------------
+st.sidebar.title("🏦 Loan Dashboard")
+page = st.sidebar.radio(
+    "Navigation",
+    ["Applicant Form", "Summary", "Analytics"]
+)
 
-    # Centered Loan Image
-    st.image("https://daxg39y63pxwu.cloudfront.net/images/blog/loan-prediction-using-machine-learning-project-source-code/Loan_Prediction_using__Machine_Learning_Project.webp", width=300, use_column_width=False)
+# ---------------------------------------------------
+# PAGE 1: APPLICANT FORM
+# ---------------------------------------------------
+if page == "Applicant Form":
 
-    with st.form("loan_form"):
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.title("Loan Approval Prediction")
+    st.progress(33)
+
+    col1, col2 = st.columns(2)
+
+    with col1:
         name = st.text_input("Applicant Name")
         gender = st.selectbox("Gender", df['Gender'].unique())
-        married = st.selectbox("Married", df['Married'].unique())
         education = st.selectbox("Education", df['Education'].unique())
-        property_area = st.selectbox("Property Area", df['Property_Area'].unique())
+        credit_history = st.selectbox("Credit History", [1.0, 0.0])
 
-        dependents = st.number_input("Number of Dependents", 0, 5)
+    with col2:
+        married = st.selectbox("Married", df['Married'].unique())
+        dependents = st.number_input("Dependents", 0, 5)
         applicant_income = st.number_input("Applicant Income", min_value=0)
         loan_amount = st.number_input("Loan Amount", min_value=0)
-        credit_history = st.selectbox("Credit History", [0.0, 1.0])
 
-        next_btn = st.form_submit_button("Next ➡️")
-
-    if next_btn:
+    if st.button("🔍 Predict Loan"):
         st.session_state.user_data = {
-            'Name': name,
-            'Gender': gender,
-            'Married': married,
-            'Education': education,
-            'Property Area': property_area,
-            'Dependents': dependents,
-            'Applicant Income': applicant_income,
-            'Loan Amount': loan_amount,
-            'Credit History': credit_history
+            "Name": name,
+            "Gender": gender,
+            "Education": education,
+            "Married": married,
+            "Dependents": dependents,
+            "Income": applicant_income,
+            "Loan Amount": loan_amount,
+            "Credit History": credit_history
         }
-        st.session_state.page = 2
-        st.rerun()
 
-    # Bottom-right image
-    st.markdown(
-        """
-        <div style="position: relative; text-align: right;">
-            <img src="https://static.vecteezy.com/system/resources/previews/024/269/241/original/car-house-personal-money-loan-concept-finance-business-icon-on-wooden-cube-saving-money-for-a-car-money-and-house-wooden-cubes-with-word-loan-copy-space-for-text-loan-payment-car-and-house.jpg" width="200" style="position: absolute; bottom: 0; right: 0;">
-        </div>
-        """,
+        st.session_state.result = predict_loan(
+            credit_history, applicant_income, loan_amount
+        )
+
+        st.success("Prediction Generated! Go to Summary ➡️")
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ---------------------------------------------------
+# PAGE 2: SUMMARY
+# ---------------------------------------------------
+if page == "Summary" and "user_data" in st.session_state:
+
+    st.progress(66)
+    user = st.session_state.user_data
+    result = st.session_state.result
+
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.subheader("📄 Applicant Summary")
+    st.table(pd.DataFrame(user.items(), columns=["Field", "Value"]))
+
+    if result == "Approved":
+        st.markdown("<div class='badge-success'>🎉 Loan Approved</div>", unsafe_allow_html=True)
+    else:
+        st.markdown("<div class='badge-danger'>❌ Loan Rejected</div>", unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ---------------------------------------------------
+# PAGE 3: ANALYTICS DASHBOARD
+# ---------------------------------------------------
+if page == "Analytics":
+
+    st.progress(100)
+
+    # KPI CARDS
+    col1, col2, col3 = st.columns(3)
+
+    col1.markdown(
+        f"<div class='metric-card'>Approval Rate<br><h2>{df.Loan_Status.mean()*100:.1f}%</h2></div>",
         unsafe_allow_html=True
     )
 
-# ----------------------------
-# PAGE 2 – DETAILS + RESULT
-# ----------------------------
-if st.session_state.page == 2:
-    st.title("📄 Applicant Summary – Step 2")
+    col2.markdown(
+        f"<div class='metric-card'>Average Loan<br><h2>{df.LoanAmount.mean():.0f}</h2></div>",
+        unsafe_allow_html=True
+    )
 
-    user = st.session_state.user_data
+    col3.markdown(
+        f"<div class='metric-card'>Total Applicants<br><h2>{len(df)}</h2></div>",
+        unsafe_allow_html=True
+    )
 
-    result = predict_loan(user['Credit History'], user['Applicant Income'], user['Loan Amount'])
+    st.markdown("<br>", unsafe_allow_html=True)
 
-    st.subheader("Entered Details")
-    st.table(pd.DataFrame(user.items(), columns=["Field", "Value"]))
+    # INTERACTIVE CHARTS
+    fig1 = px.bar(
+        df, x="Gender", y="Loan_Status",
+        title="Loan Approval by Gender",
+        color="Gender"
+    )
+    st.plotly_chart(fig1, use_container_width=True)
 
-    st.subheader("Loan Data Overview")
-    st.dataframe(df)  # table visual of the dataset
+    fig2 = px.bar(
+        df, x="Education", y="Loan_Status",
+        title="Loan Approval by Education",
+        color="Education"
+    )
+    st.plotly_chart(fig2, use_container_width=True)
 
-    if result == "Approved":
-        st.success("🎉 Loan Approved")
-    else:
-        st.error("❌ Loan Not Approved")
+    fig3 = px.bar(
+        df, x="Property_Area", y="Loan_Status",
+        title="Loan Approval by Property Area",
+        color="Property_Area"
+    )
+    st.plotly_chart(fig3, use_container_width=True)
 
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("⬅️ Back"):
-            st.session_state.page = 1
-            st.experimental_rerun()
-    with col2:
-        if st.button("View Analysis ➡️"):
-            st.session_state.page = 3
-            st.rerun()
-
-# ----------------------------
-# PAGE 3 – DASHBOARD
-# ----------------------------
-if st.session_state.page == 3:
-    st.title("📊 Loan Approval Analysis – Step 3")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.subheader("Loan Approval by Gender")
-        fig, ax = plt.subplots()
-        sb.barplot(x=df.Gender, y=df.Loan_Status, ax=ax)
-        st.pyplot(fig)
-
-    with col2:
-        st.subheader("Loan Approval by Marital Status")
-        fig, ax = plt.subplots()
-        sb.barplot(x=df.Married, y=df.Loan_Status, ax=ax)
-        st.pyplot(fig)
-
-    st.subheader("Loan Approval by Education")
-    fig, ax = plt.subplots()
-    sb.barplot(x=df.Education, y=df.Loan_Status, ax=ax)
-    st.pyplot(fig)
-
-    st.subheader("Loan Approval by Property Area")
-    fig, ax = plt.subplots()
-    sb.barplot(x=df.Property_Area, y=df.Loan_Status, ax=ax)
-    st.pyplot(fig)
-
-    if st.button("⬅️ Back to Summary"):
-        st.session_state.page = 2
-        st.rerun()
+    st.subheader("📊 Raw Dataset")
+    st.dataframe(df, use_container_width=True)
