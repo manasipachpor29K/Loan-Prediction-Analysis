@@ -126,18 +126,18 @@ if page == "Applicant Form":
         loan = st.number_input("Loan Amount", min_value=0)
 
     if st.button("🔍 Predict Loan"):
-        result = predict_loan(credit_history, income, loan)
-        st.session_state["result"] = result
+    result = predict_loan(credit_history, income, loan)
+    st.session_state["result"] = result
 
-        if result == "Approved":
-            st.success("🎉 Loan Approved Successfully!")
-        else:
-            st.error("❌ Loan Rejected")
-           st.info(
-    "How to improve approval chances:\n"
-    "• Maintain good credit score\n"
-    "• Increase income\n"
-    "• Reduce loan amount\n"
-    "• Avoid multiple loan requests"
-)
+    if result == "Approved":
+        st.success("🎉 Loan Approved Successfully!")
+    else:
+        st.error("❌ Loan Rejected")
+        st.info(
+            "How to improve approval chances:\n"
+            "• Maintain good credit score\n"
+            "• Increase income\n"
+            "• Reduce loan amount\n"
+            "• Avoid multiple loan requests"
+        )
 
