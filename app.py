@@ -11,80 +11,67 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-/* FULL PAGE BACKGROUND ON STREAMLIT APP */
-.stApp::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+/* MAIN BACKGROUND */
+[data-testid="stAppViewContainer"] {
     background-image: url("https://t4.ftcdn.net/jpg/16/97/54/69/360_F_1697546950_YG9PdzRMoRv2owtMUU7T6o0Des5fPAws.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    filter: blur(5px); /* blur effect */
-    z-index: -2;
 }
 
-/* DARK OVERLAY TO MAKE TEXT READABLE */
-.stApp::after {
+/* DARK OVERLAY */
+[data-testid="stAppViewContainer"]::before {
     content: "";
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     background-color: rgba(0,0,0,0.45);
     z-index: -1;
+}
+
+/* REMOVE STREAMLIT DEFAULT BACKGROUND */
+[data-testid="stHeader"] {
+    background: rgba(0,0,0,0);
 }
 
 /* WHITE CARD */
 .card {
     background-color: rgba(255,255,255,0.95);
-    padding: 25px;
-    border-radius: 15px;
-    box-shadow: 0px 8px 25px rgba(0,0,0,0.3);
-    margin-bottom: 25px;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0px 10px 30px rgba(0,0,0,0.35);
+    margin-bottom: 30px;
 }
 
 /* BADGES */
 .badge-success {
     background-color: #d4edda;
     color: #155724;
-    padding: 15px;
+    padding: 16px;
     border-radius: 12px;
     font-weight: bold;
     text-align: center;
-    font-size: 18px;
+    font-size: 20px;
 }
 .badge-danger {
     background-color: #f8d7da;
     color: #721c24;
-    padding: 15px;
+    padding: 16px;
     border-radius: 12px;
     font-weight: bold;
     text-align: center;
-    font-size: 18px;
+    font-size: 20px;
 }
 
-/* CARD HEADINGS */
-h1, h2, h3, h4, h5, h6 {
-    color: #000000;
-}
-
-/* TEXT INPUTS & SELECTBOXES */
-.stTextInput>div>div>input, 
-.stSelectbox>div>div>div>select, 
-.stNumberInput>div>div>input {
-    background-color: rgba(255,255,255,0.95);
-    color: #000;
+/* INPUT FIELDS */
+.stTextInput input,
+.stSelectbox select,
+.stNumberInput input {
+    background-color: #ffffff !important;
+    color: #000000 !important;
 }
 
 </style>
 """, unsafe_allow_html=True)
-
-
 
 # ---------------- SIDEBAR ----------------
 st.sidebar.title("🏦 Loan Dashboard")
@@ -93,7 +80,7 @@ page = st.sidebar.radio(
     ["Applicant Form", "Summary", "Analytics"]
 )
 
-# ---------------- DUMMY DATA ----------------
+# ---------------- SAMPLE DATA ----------------
 df = pd.DataFrame({
     "Gender": ["Male", "Female"],
     "Married": ["Yes", "No"]
@@ -109,9 +96,8 @@ def predict_loan(credit_history, income, loan):
 # ---------------- PAGE 1: APPLICANT FORM ----------------
 if page == "Applicant Form":
 
-    st.title("Loan Approval Prediction Analysis")
+    st.title("💳 Loan Approval Prediction Analysis")
 
-    # CENTER IMAGE
     col1, col2, col3 = st.columns([1,2,1])
     with col2:
         st.image(
@@ -126,7 +112,7 @@ if page == "Applicant Form":
     with col1:
         name = st.text_input("Applicant Name")
         gender = st.selectbox("Gender", df["Gender"])
-        credit_history = st.selectbox("Credit History", [1, 0])
+        credit_history = st.selectbox("Credit History (1 = Good, 0 = Bad)", [1, 0])
 
     with col2:
         married = st.selectbox("Married", df["Married"])
@@ -159,7 +145,7 @@ elif page == "Summary":
     col1, col2, col3 = st.columns([1,2,1])
     with col2:
         st.image(
-            "https://media.assettype.com/gulfnews%2Fimport%2F2023%2F02%2F07%2FStock-Bank-Loan_1862a8288fe_large.jpg",
+            "https://media.assettype.com/gulfnews/import/2023/02/07/Stock-Bank-Loan_1862a8288fe_large.jpg",
             width=420
         )
 
@@ -190,4 +176,3 @@ elif page == "Analytics":
     st.write("Sample Dataset")
     st.dataframe(df)
     st.markdown("</div>", unsafe_allow_html=True)
-
