@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -6,7 +7,7 @@ import plotly.express as px
 # PAGE CONFIG
 # ---------------------------------------------------
 st.set_page_config(
-    page_title="Loan Approval Dashboard",
+    page_title="Loan Approval Prediction Analysis",
     page_icon="🏦",
     layout="wide"
 )
@@ -96,14 +97,15 @@ page = st.sidebar.radio(
 # ---------------------------------------------------
 if page == "Applicant Form":
 
-    # 🔹 STARTING PAGE IMAGE
+    st.title("Loan Approval Prediction Analysis")
+
+    # 🔹 SMALLER IMAGE
     st.image(
         "https://daxg39y63pxwu.cloudfront.net/images/blog/loan-prediction-using-machine-learning-project-source-code/Loan_Prediction_using__Machine_Learning_Project.webp",
-        use_container_width=True
+        width=500
     )
 
     st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.title("Loan Approval Prediction")
     st.progress(33)
 
     col1, col2 = st.columns(2)
@@ -136,18 +138,17 @@ if page == "Applicant Form":
         st.session_state.result = result
 
         if result == "Approved":
-            st.success("🎉 Congratulations! Loan Approved")
+            st.success("🎉 Loan Approved")
         else:
-            # 🔴 REJECTED POPUP + TIPS
             st.error("❌ Loan Rejected")
 
             with st.expander("💡 Tips to Improve Loan Approval"):
                 st.markdown("""
-                ✅ **Maintain a good credit score** (repay EMIs on time)  
-                ✅ **Increase applicant income** or add a co-applicant  
-                ✅ **Reduce loan amount** compared to income  
-                ✅ **Clear existing debts** before applying  
-                ✅ **Apply with stable employment history**
+                ✅ Improve your credit score  
+                ✅ Reduce loan amount  
+                ✅ Increase income or add co-applicant  
+                ✅ Clear existing EMIs  
+                ✅ Maintain stable job
                 """)
 
     st.markdown("</div>", unsafe_allow_html=True)
@@ -157,19 +158,19 @@ if page == "Applicant Form":
 # ---------------------------------------------------
 if page == "Summary" and "user_data" in st.session_state:
 
+    st.title("📄 Applicant Summary")
     st.progress(66)
 
-    # 🔹 SUMMARY PAGE IMAGE
+    # 🔹 IMAGE NOW VISIBLE
     st.image(
         "https://static.vecteezy.com/system/resources/previews/024/269/241/original/car-house-personal-money-loan-concept-finance-business-icon-on-wooden-cube-saving-money-for-a-car-money-and-house-wooden-cubes-with-word-loan-copy-space-for-text-loan-payment-car-and-house.jpg",
-        use_container_width=True
+        width=500
     )
 
     user = st.session_state.user_data
     result = st.session_state.result
 
     st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.subheader("📄 Applicant Summary")
     st.table(pd.DataFrame(user.items(), columns=["Field", "Value"]))
 
     if result == "Approved":
@@ -184,6 +185,7 @@ if page == "Summary" and "user_data" in st.session_state:
 # ---------------------------------------------------
 if page == "Analytics":
 
+    st.title("📊 Loan Approval Analysis")
     st.progress(100)
 
     col1, col2, col3 = st.columns(3)
@@ -206,3 +208,10 @@ if page == "Analytics":
 
     fig2 = px.bar(df, x="Education", y="Loan_Status", title="Approval by Education", color="Education")
     st.plotly_chart(fig2, use_container_width=True)
+
+    fig3 = px.bar(df, x="Property_Area", y="Loan_Status", title="Approval by Property Area", color="Property_Area")
+    st.plotly_chart(fig3, use_container_width=True)
+
+    # 🔹 RAW DATA FIXED
+    st.subheader("📄 Raw Loan Dataset")
+    st.dataframe(df, use_container_width=True)
