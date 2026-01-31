@@ -11,7 +11,7 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-/* MAIN BACKGROUND */
+/* BACKGROUND */
 [data-testid="stAppViewContainer"] {
     background-image: url("https://t4.ftcdn.net/jpg/16/97/54/69/360_F_1697546950_YG9PdzRMoRv2owtMUU7T6o0Des5fPAws.jpg");
     background-size: cover;
@@ -24,18 +24,28 @@ st.markdown("""
     content: "";
     position: fixed;
     inset: 0;
-    background-color: rgba(0,0,0,0.45);
+    background-color: rgba(0,0,0,0.55);
     z-index: -1;
 }
 
-/* REMOVE STREAMLIT DEFAULT BACKGROUND */
+/* REMOVE HEADER BG */
 [data-testid="stHeader"] {
-    background: rgba(0,0,0,0);
+    background: transparent;
+}
+
+/* MAIN TITLE */
+.main-title {
+    text-align: center;
+    font-size: 42px;
+    font-weight: 800;
+    color: #ffffff;
+    margin-top: 10px;
+    margin-bottom: 30px;
 }
 
 /* WHITE CARD */
 .card {
-    background-color: rgba(255,255,255,0.95);
+    background-color: rgba(255,255,255,0.96);
     padding: 30px;
     border-radius: 16px;
     box-shadow: 0px 10px 30px rgba(0,0,0,0.35);
@@ -44,22 +54,39 @@ st.markdown("""
 
 /* BADGES */
 .badge-success {
-    background-color: #d4edda;
-    color: #155724;
-    padding: 16px;
+    background-color: #d1fae5;
+    color: #065f46;
+    padding: 18px;
     border-radius: 12px;
     font-weight: bold;
     text-align: center;
-    font-size: 20px;
+    font-size: 22px;
 }
 .badge-danger {
-    background-color: #f8d7da;
-    color: #721c24;
-    padding: 16px;
+    background-color: #fee2e2;
+    color: #7f1d1d;
+    padding: 18px;
     border-radius: 12px;
     font-weight: bold;
     text-align: center;
-    font-size: 20px;
+    font-size: 22px;
+}
+
+/* POPUP MESSAGES FIX */
+.stSuccess {
+    background-color: #ecfdf5 !important;
+    color: #065f46 !important;
+    border-radius: 10px;
+}
+.stError {
+    background-color: #fef2f2 !important;
+    color: #7f1d1d !important;
+    border-radius: 10px;
+}
+.stInfo {
+    background-color: #eff6ff !important;
+    color: #1e3a8a !important;
+    border-radius: 10px;
 }
 
 /* INPUT FIELDS */
@@ -80,30 +107,27 @@ page = st.sidebar.radio(
     ["Applicant Form", "Summary", "Analytics"]
 )
 
-# ---------------- SAMPLE DATA ----------------
+# ---------------- DATA ----------------
 df = pd.DataFrame({
     "Gender": ["Male", "Female"],
     "Married": ["Yes", "No"]
 })
 
-# ---------------- PREDICTION LOGIC ----------------
+# ---------------- LOGIC ----------------
 def predict_loan(credit_history, income, loan):
     if credit_history == 1 and income > 5000 and loan < income * 2:
         return "Approved"
     else:
         return "Rejected"
 
-# ---------------- PAGE 1: APPLICANT FORM ----------------
+# ================= PAGE 1 =================
 if page == "Applicant Form":
 
-    st.title("💳 Loan Approval Prediction Analysis")
-
-    col1, col2, col3 = st.columns([1,2,1])
-    with col2:
-        st.image(
-            "https://www.cashe.co.in/wp-content/uploads/2024/01/Loan_Term.png",
-            width=380
-        )
+    # 🔥 TOP TITLE (WHITE & BOLD)
+    st.markdown(
+        "<div class='main-title'>Loan Approval Prediction Analysis</div>",
+        unsafe_allow_html=True
+    )
 
     st.markdown("<div class='card'>", unsafe_allow_html=True)
 
@@ -124,55 +148,30 @@ if page == "Applicant Form":
         st.session_state.result = result
 
         if result == "Approved":
-            st.success("🎉 Loan Approved")
+            st.success("🎉 Loan Approved Successfully!")
         else:
             st.error("❌ Loan Rejected")
             st.info("""
-            **Tips to Improve Approval:**
-            - Maintain good credit history  
-            - Increase monthly income  
-            - Reduce loan amount  
-            - Avoid multiple loan applications
+            **How to improve approval chances:**
+            • Maintain good credit score  
+            • Increase income  
+            • Reduce loan amount  
+            • Avoid multiple loan requests
             """)
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-# ---------------- PAGE 2: SUMMARY ----------------
+# ================= PAGE 2 =================
 elif page == "Summary":
 
-    st.title("📄 Loan Summary")
-
-    col1, col2, col3 = st.columns([1,2,1])
-    with col2:
-        st.image(
-            "https://media.assettype.com/gulfnews/import/2023/02/07/Stock-Bank-Loan_1862a8288fe_large.jpg",
-            width=420
-        )
+    st.markdown(
+        "<div class='main-title'>Loan Summary</div>",
+        unsafe_allow_html=True
+    )
 
     st.markdown("<div class='card'>", unsafe_allow_html=True)
 
     if "result" in st.session_state:
         if st.session_state.result == "Approved":
             st.markdown(
-                "<div class='badge-success'>🎉 Congratulations! Loan Approved</div>",
-                unsafe_allow_html=True
-            )
-        else:
-            st.markdown(
-                "<div class='badge-danger'>❌ Loan Rejected</div>",
-                unsafe_allow_html=True
-            )
-    else:
-        st.warning("Please submit the applicant form first.")
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# ---------------- PAGE 3: ANALYTICS ----------------
-elif page == "Analytics":
-
-    st.title("📊 Loan Analytics")
-
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.write("Sample Dataset")
-    st.dataframe(df)
-    st.markdown("</div>", unsafe_allow_html=True)
+                "<d
