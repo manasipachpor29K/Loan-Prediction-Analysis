@@ -69,7 +69,6 @@ def load_data():
     df['Credit_History'] = df['Credit_History'].fillna(1.0)
 
     df['Loan_Status'] = df['Loan_Status'].map({'Y': 1, 'N': 0})
-
     return df
 
 df = load_data()
@@ -96,6 +95,12 @@ page = st.sidebar.radio(
 # PAGE 1: APPLICANT FORM
 # ---------------------------------------------------
 if page == "Applicant Form":
+
+    # 🔹 STARTING PAGE IMAGE
+    st.image(
+        "https://daxg39y63pxwu.cloudfront.net/images/blog/loan-prediction-using-machine-learning-project-source-code/Loan_Prediction_using__Machine_Learning_Project.webp",
+        use_container_width=True
+    )
 
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.title("Loan Approval Prediction")
@@ -127,11 +132,23 @@ if page == "Applicant Form":
             "Credit History": credit_history
         }
 
-        st.session_state.result = predict_loan(
-            credit_history, applicant_income, loan_amount
-        )
+        result = predict_loan(credit_history, applicant_income, loan_amount)
+        st.session_state.result = result
 
-        st.success("Prediction Generated! Go to Summary ➡️")
+        if result == "Approved":
+            st.success("🎉 Congratulations! Loan Approved")
+        else:
+            # 🔴 REJECTED POPUP + TIPS
+            st.error("❌ Loan Rejected")
+
+            with st.expander("💡 Tips to Improve Loan Approval"):
+                st.markdown("""
+                ✅ **Maintain a good credit score** (repay EMIs on time)  
+                ✅ **Increase applicant income** or add a co-applicant  
+                ✅ **Reduce loan amount** compared to income  
+                ✅ **Clear existing debts** before applying  
+                ✅ **Apply with stable employment history**
+                """)
 
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -141,6 +158,13 @@ if page == "Applicant Form":
 if page == "Summary" and "user_data" in st.session_state:
 
     st.progress(66)
+
+    # 🔹 SUMMARY PAGE IMAGE
+    st.image(
+        "https://static.vecteezy.com/system/resources/previews/024/269/241/original/car-house-personal-money-loan-concept-finance-business-icon-on-wooden-cube-saving-money-for-a-car-money-and-house-wooden-cubes-with-word-loan-copy-space-for-text-loan-payment-car-and-house.jpg",
+        use_container_width=True
+    )
+
     user = st.session_state.user_data
     result = st.session_state.result
 
@@ -156,53 +180,29 @@ if page == "Summary" and "user_data" in st.session_state:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ---------------------------------------------------
-# PAGE 3: ANALYTICS DASHBOARD
+# PAGE 3: ANALYTICS
 # ---------------------------------------------------
 if page == "Analytics":
 
     st.progress(100)
 
-    # KPI CARDS
     col1, col2, col3 = st.columns(3)
 
     col1.markdown(
         f"<div class='metric-card'>Approval Rate<br><h2>{df.Loan_Status.mean()*100:.1f}%</h2></div>",
         unsafe_allow_html=True
     )
-
     col2.markdown(
         f"<div class='metric-card'>Average Loan<br><h2>{df.LoanAmount.mean():.0f}</h2></div>",
         unsafe_allow_html=True
     )
-
     col3.markdown(
-        f"<div class='metric-card'>Total Applicants<br><h2>{len(df)}</h2></div>",
+        f"<div class='metric-card'>Applicants<br><h2>{len(df)}</h2></div>",
         unsafe_allow_html=True
     )
 
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    # INTERACTIVE CHARTS
-    fig1 = px.bar(
-        df, x="Gender", y="Loan_Status",
-        title="Loan Approval by Gender",
-        color="Gender"
-    )
+    fig1 = px.bar(df, x="Gender", y="Loan_Status", title="Approval by Gender", color="Gender")
     st.plotly_chart(fig1, use_container_width=True)
 
-    fig2 = px.bar(
-        df, x="Education", y="Loan_Status",
-        title="Loan Approval by Education",
-        color="Education"
-    )
+    fig2 = px.bar(df, x="Education", y="Loan_Status", title="Approval by Education", color="Education")
     st.plotly_chart(fig2, use_container_width=True)
-
-    fig3 = px.bar(
-        df, x="Property_Area", y="Loan_Status",
-        title="Loan Approval by Property Area",
-        color="Property_Area"
-    )
-    st.plotly_chart(fig3, use_container_width=True)
-
-    st.subheader("📊 Raw Dataset")
-    st.dataframe(df, use_container_width=True)
