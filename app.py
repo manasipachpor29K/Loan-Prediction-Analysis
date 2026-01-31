@@ -133,8 +133,11 @@ if page == "Applicant Form":
             st.success("🎉 Loan Approved Successfully!")
         else:
             st.error("❌ Loan Rejected")
-            st.info(
-                "How to improve approval chances:\n"
-                "• Maintain good credit score\n"
-                "• Increase income\n"
-                "• Reduce loan amount\n"
+           st.info(
+    "How to improve approval chances:\n"
+    "• Maintain good credit score\n"
+    "• Increase income\n"
+    "• Reduce loan amount\n"
+    "• Avoid multiple loan requests"
+)
+
