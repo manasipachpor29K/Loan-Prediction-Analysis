@@ -140,4 +140,3 @@ if page == "Applicant Form":
             "• Reduce loan amount\n"
             "• Avoid multiple loan requests"
         )
-
