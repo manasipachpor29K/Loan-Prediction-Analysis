@@ -10,6 +10,8 @@ st.set_page_config(
 # ---------------- CSS ----------------
 st.markdown("""
 <style>
+
+/* BACKGROUND IMAGE */
 [data-testid="stAppViewContainer"] {
     background-image: url("https://t4.ftcdn.net/jpg/16/97/54/69/360_F_1697546950_YG9PdzRMoRv2owtMUU7T6o0Des5fPAws.jpg");
     background-size: cover;
@@ -17,6 +19,7 @@ st.markdown("""
     background-repeat: no-repeat;
 }
 
+/* DARK OVERLAY */
 [data-testid="stAppViewContainer"]::before {
     content: "";
     position: fixed;
@@ -25,18 +28,30 @@ st.markdown("""
     z-index: -1;
 }
 
+/* REMOVE DEFAULT HEADER BG */
 [data-testid="stHeader"] {
     background: transparent;
 }
 
+/* MAIN TITLE */
 .main-title {
     text-align: center;
     font-size: 42px;
     font-weight: 800;
-    color: white;
+    color: #ffffff;
     margin: 20px 0 30px 0;
 }
 
+/* FORM LABELS WHITE */
+label,
+.stTextInput label,
+.stSelectbox label,
+.stNumberInput label {
+    color: #ffffff !important;
+    font-weight: 600;
+}
+
+/* WHITE CARD */
 .card {
     background-color: rgba(255,255,255,0.96);
     padding: 30px;
@@ -45,6 +60,7 @@ st.markdown("""
     margin-bottom: 30px;
 }
 
+/* BADGES */
 .badge-success {
     background-color: #d1fae5;
     color: #065f46;
@@ -65,6 +81,19 @@ st.markdown("""
     font-size: 22px;
 }
 
+/* CUSTOM WARNING */
+.custom-warning {
+    background-color: #fff3cd;
+    color: #664d03;
+    padding: 18px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 18px;
+    text-align: center;
+    border: 2px solid #ffecb5;
+}
+
+/* POPUP COLORS */
 .stSuccess {
     background-color: #ecfdf5 !important;
     color: #065f46 !important;
@@ -79,6 +108,7 @@ st.markdown("""
     background-color: #eff6ff !important;
     color: #1e3a8a !important;
 }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -163,7 +193,10 @@ elif page == "Summary":
                 unsafe_allow_html=True
             )
     else:
-        st.warning("Please submit the applicant form first.")
+        st.markdown(
+            "<div class='custom-warning'>⚠️ Please submit the applicant form first</div>",
+            unsafe_allow_html=True
+        )
 
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -178,4 +211,3 @@ elif page == "Analytics":
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.dataframe(df)
     st.markdown("</div>", unsafe_allow_html=True)
-
