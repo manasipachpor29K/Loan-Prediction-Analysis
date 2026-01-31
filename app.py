@@ -11,37 +11,37 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-/* FULL PAGE BACKGROUND WITH BLUR */
-body::before {
+/* FULL PAGE BACKGROUND ON STREAMLIT APP */
+.stApp::before {
     content: "";
     position: fixed;
     top: 0;
     left: 0;
-    height: 100%;
     width: 100%;
+    height: 100%;
     background-image: url("https://t4.ftcdn.net/jpg/16/97/54/69/360_F_1697546950_YG9PdzRMoRv2owtMUU7T6o0Des5fPAws.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    filter: blur(5px); /* Add blur */
+    filter: blur(5px); /* blur effect */
     z-index: -2;
 }
 
 /* DARK OVERLAY TO MAKE TEXT READABLE */
-body::after {
+.stApp::after {
     content: "";
     position: fixed;
     top: 0;
     left: 0;
-    height: 100%;
     width: 100%;
-    background-color: rgba(0,0,0,0.45); /* Adjust darkness for readability */
+    height: 100%;
+    background-color: rgba(0,0,0,0.45);
     z-index: -1;
 }
 
 /* WHITE CARD */
 .card {
-    background-color: rgba(255,255,255,0.95); /* Slightly transparent for soft look */
+    background-color: rgba(255,255,255,0.95);
     padding: 25px;
     border-radius: 15px;
     box-shadow: 0px 8px 25px rgba(0,0,0,0.3);
@@ -70,17 +70,20 @@ body::after {
 
 /* CARD HEADINGS */
 h1, h2, h3, h4, h5, h6 {
-    color: #000000; /* Dark headings for cards */
+    color: #000000;
 }
 
 /* TEXT INPUTS & SELECTBOXES */
-.stTextInput>div>div>input, .stSelectbox>div>div>div>select, .stNumberInput>div>div>input {
-    background-color: rgba(255,255,255,0.95); /* Inputs readable */
+.stTextInput>div>div>input, 
+.stSelectbox>div>div>div>select, 
+.stNumberInput>div>div>input {
+    background-color: rgba(255,255,255,0.95);
     color: #000;
 }
 
 </style>
 """, unsafe_allow_html=True)
+
 
 
 # ---------------- SIDEBAR ----------------
