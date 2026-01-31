@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -97,16 +98,6 @@ page = st.sidebar.radio(
 if page == "Applicant Form":
 
     st.title("Loan Approval Prediction Analysis")
-
-    # 🔹 CENTERED IMAGE
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.image(
-            "https://www.cashe.co.in/wp-content/uploads/2024/01/Loan_Term.png",
-            width=400
-        )
-
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.progress(33)
 
     col1, col2 = st.columns(2)
@@ -124,34 +115,37 @@ if page == "Applicant Form":
         loan_amount = st.number_input("Loan Amount", min_value=0)
 
     if st.button("🔍 Predict Loan"):
-        st.session_state.user_data = {
-            "Name": name,
-            "Gender": gender,
-            "Education": education,
-            "Married": married,
-            "Dependents": dependents,
-            "Income": applicant_income,
-            "Loan Amount": loan_amount,
-            "Credit History": credit_history
-        }
 
-        result = predict_loan(credit_history, applicant_income, loan_amount)
-        st.session_state.result = result
+        if name.strip() == "" or applicant_income == 0 or loan_amount == 0:
+            st.warning("⚠️ Please !! Enter the Applicant Details ..")
 
-        if result == "Approved":
-            st.success("🎉 Loan Approved")
         else:
-            st.error("❌ Loan Rejected")
-            with st.expander("💡 Tips to Improve Loan Approval"):
-                st.markdown("""
-                ✅ Improve your credit score  
-                ✅ Reduce loan amount  
-                ✅ Increase income or add co-applicant  
-                ✅ Clear existing EMIs  
-                ✅ Maintain stable job
-                """)
+            st.session_state.user_data = {
+                "Name": name,
+                "Gender": gender,
+                "Education": education,
+                "Married": married,
+                "Dependents": dependents,
+                "Income": applicant_income,
+                "Loan Amount": loan_amount,
+                "Credit History": credit_history
+            }
 
-    st.markdown("</div>", unsafe_allow_html=True)
+            result = predict_loan(credit_history, applicant_income, loan_amount)
+            st.session_state.result = result
+
+            if result == "Approved":
+                st.success("🎉 Loan Approved")
+            else:
+                st.error("❌ Loan Rejected")
+                with st.expander("💡 Tips to Improve Loan Approval"):
+                    st.markdown("""
+                    ✅ Improve your credit score  
+                    ✅ Reduce loan amount  
+                    ✅ Increase income or add co-applicant  
+                    ✅ Clear existing EMIs  
+                    ✅ Maintain stable job
+                    """)
 
 # ---------------------------------------------------
 # PAGE 2: SUMMARY
@@ -160,14 +154,6 @@ if page == "Summary":
 
     st.title("📄 Applicant Summary")
     st.progress(66)
-
-    # ➤ NEW IMAGE ON SECOND PAGE (CENTERED)
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.image(
-            "https://media.assettype.com/gulfnews%2Fimport%2F2023%2F02%2F07%2FStock-Bank-Loan_1862a8288fe_large.jpg?w=640&auto=format%2Ccompress&fit=max",
-            width=450
-        )
 
     if "user_data" not in st.session_state:
         st.warning("⚠️ Please fill the Applicant Form and Predict Loan first.")
