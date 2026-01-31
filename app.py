@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -23,7 +22,7 @@ st.markdown("""
 .card {
     background-color: white;
     padding: 25px;
-    border-radius: 15px;
+    border-radius: 12px;
     box-shadow: 0px 4px 15px rgba(0,0,0,0.08);
     margin-bottom: 20px;
 }
@@ -99,11 +98,13 @@ if page == "Applicant Form":
 
     st.title("Loan Approval Prediction Analysis")
 
-    # 🔹 SMALLER IMAGE
-    st.image(
-        "https://daxg39y63pxwu.cloudfront.net/images/blog/loan-prediction-using-machine-learning-project-source-code/Loan_Prediction_using__Machine_Learning_Project.webp",
-        width=500
-    )
+    # 🔹 CENTERED IMAGE
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.image(
+            "https://www.cashe.co.in/wp-content/uploads/2024/01/Loan_Term.png",
+            width=400
+        )
 
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.progress(33)
@@ -141,7 +142,6 @@ if page == "Applicant Form":
             st.success("🎉 Loan Approved")
         else:
             st.error("❌ Loan Rejected")
-
             with st.expander("💡 Tips to Improve Loan Approval"):
                 st.markdown("""
                 ✅ Improve your credit score  
@@ -156,29 +156,40 @@ if page == "Applicant Form":
 # ---------------------------------------------------
 # PAGE 2: SUMMARY
 # ---------------------------------------------------
-if page == "Summary" and "user_data" in st.session_state:
+if page == "Summary":
 
     st.title("📄 Applicant Summary")
     st.progress(66)
 
-    # 🔹 IMAGE NOW VISIBLE
-    st.image(
-        "https://static.vecteezy.com/system/resources/previews/024/269/241/original/car-house-personal-money-loan-concept-finance-business-icon-on-wooden-cube-saving-money-for-a-car-money-and-house-wooden-cubes-with-word-loan-copy-space-for-text-loan-payment-car-and-house.jpg",
-        width=500
-    )
+    # ➤ NEW IMAGE ON SECOND PAGE (CENTERED)
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.image(
+            "https://media.assettype.com/gulfnews%2Fimport%2F2023%2F02%2F07%2FStock-Bank-Loan_1862a8288fe_large.jpg?w=640&auto=format%2Ccompress&fit=max",
+            width=450
+        )
 
-    user = st.session_state.user_data
-    result = st.session_state.result
-
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.table(pd.DataFrame(user.items(), columns=["Field", "Value"]))
-
-    if result == "Approved":
-        st.markdown("<div class='badge-success'>🎉 Loan Approved</div>", unsafe_allow_html=True)
+    if "user_data" not in st.session_state:
+        st.warning("⚠️ Please fill the Applicant Form and Predict Loan first.")
     else:
-        st.markdown("<div class='badge-danger'>❌ Loan Rejected</div>", unsafe_allow_html=True)
+        user = st.session_state.user_data
+        result = st.session_state.result
 
-    st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        st.table(pd.DataFrame(user.items(), columns=["Field", "Value"]))
+
+        if result == "Approved":
+            st.markdown(
+                "<div class='badge-success'>🎉 Loan Approved</div>",
+                unsafe_allow_html=True
+            )
+        else:
+            st.markdown(
+                "<div class='badge-danger'>❌ Loan Rejected</div>",
+                unsafe_allow_html=True
+            )
+
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # ---------------------------------------------------
 # PAGE 3: ANALYTICS
@@ -212,6 +223,7 @@ if page == "Analytics":
     fig3 = px.bar(df, x="Property_Area", y="Loan_Status", title="Approval by Property Area", color="Property_Area")
     st.plotly_chart(fig3, use_container_width=True)
 
-    # 🔹 RAW DATA FIXED
     st.subheader("📄 Raw Loan Dataset")
     st.dataframe(df, use_container_width=True)
+
+
