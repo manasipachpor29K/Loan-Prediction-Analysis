@@ -174,3 +174,38 @@ if page == "Summary":
             )
 
         st.markdown("</div>", unsafe_allow_html=True)
+
+# ---------------------------------------------------
+# PAGE 3: ANALYTICS
+# ---------------------------------------------------
+if page == "Analytics":
+
+    st.title("📊 Loan Approval Analysis")
+    st.progress(100)
+
+    col1, col2, col3 = st.columns(3)
+
+    col1.markdown(
+        f"<div class='metric-card'>Approval Rate<br><h2>{df.Loan_Status.mean()*100:.1f}%</h2></div>",
+        unsafe_allow_html=True
+    )
+    col2.markdown(
+        f"<div class='metric-card'>Average Loan<br><h2>{df.LoanAmount.mean():.0f}</h2></div>",
+        unsafe_allow_html=True
+    )
+    col3.markdown(
+        f"<div class='metric-card'>Applicants<br><h2>{len(df)}</h2></div>",
+        unsafe_allow_html=True
+    )
+
+    fig1 = px.bar(df, x="Gender", y="Loan_Status", title="Approval by Gender", color="Gender")
+    st.plotly_chart(fig1, use_container_width=True)
+
+    fig2 = px.bar(df, x="Education", y="Loan_Status", title="Approval by Education", color="Education")
+    st.plotly_chart(fig2, use_container_width=True)
+
+    fig3 = px.bar(df, x="Property_Area", y="Loan_Status", title="Approval by Property Area", color="Property_Area")
+    st.plotly_chart(fig3, use_container_width=True)
+
+    st.subheader("📄 Raw Loan Dataset")
+    st.dataframe(df, use_container_width=True)
