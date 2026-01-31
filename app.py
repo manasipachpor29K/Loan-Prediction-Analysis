@@ -12,7 +12,7 @@ st.set_page_config(
 )
 
 # ---------------------------------------------------
-# CUSTOM CSS
+# GLOBAL CSS
 # ---------------------------------------------------
 st.markdown("""
 <style>
@@ -20,10 +20,10 @@ st.markdown("""
     background-color: #f5f7fb;
 }
 .card {
-    background-color: white;
+    background-color: rgba(255,255,255,0.92);
     padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0px 4px 15px rgba(0,0,0,0.08);
+    border-radius: 15px;
+    box-shadow: 0px 6px 20px rgba(0,0,0,0.15);
     margin-bottom: 20px;
 }
 .metric-card {
@@ -48,6 +48,15 @@ st.markdown("""
     border-radius: 12px;
     font-weight: bold;
     text-align: center;
+}
+
+/* 🔹 Background Image for Page 1 & 2 */
+.bg-page {
+    background-image: url("https://t4.ftcdn.net/jpg/16/97/54/69/360_F_1697546950_YG9PdzRMoRv2owtMUU7T6o0Des5fPAws.jpg");
+    background-size: cover;
+    background-position: center;
+    padding: 30px;
+    border-radius: 20px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -91,19 +100,21 @@ page = st.sidebar.radio(
     ["Applicant Form", "Summary", "Analytics"]
 )
 
-# ---------------------------------------------------
-# PAGE 1: APPLICANT FORM
-# ---------------------------------------------------
+# ===================================================
+# PAGE 1: APPLICANT FORM (WITH BACKGROUND)
+# ===================================================
 if page == "Applicant Form":
+
+    st.markdown("<div class='bg-page'>", unsafe_allow_html=True)
 
     st.title("Loan Approval Prediction Analysis")
 
-    # 🔹 CENTERED IMAGE
-    col1, col2, col3 = st.columns([1, 2, 1])
+    # Center image
+    col1, col2, col3 = st.columns([1,2,1])
     with col2:
         st.image(
             "https://www.cashe.co.in/wp-content/uploads/2024/01/Loan_Term.png",
-            width=400
+            width=380
         )
 
     st.markdown("<div class='card'>", unsafe_allow_html=True)
@@ -144,33 +155,34 @@ if page == "Applicant Form":
             st.error("❌ Loan Rejected")
             with st.expander("💡 Tips to Improve Loan Approval"):
                 st.markdown("""
-                ✅ Improve your credit score  
+                ✅ Improve credit score  
                 ✅ Reduce loan amount  
                 ✅ Increase income or add co-applicant  
                 ✅ Clear existing EMIs  
-                ✅ Maintain stable job
+                ✅ Stable employment
                 """)
 
     st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# ---------------------------------------------------
-# PAGE 2: SUMMARY
-# ---------------------------------------------------
+# ===================================================
+# PAGE 2: SUMMARY (WITH BACKGROUND)
+# ===================================================
 if page == "Summary":
 
-    st.title("📄 Applicant Summary")
-    st.progress(66)
+    st.markdown("<div class='bg-page'>", unsafe_allow_html=True)
 
-    # ➤ NEW IMAGE ON SECOND PAGE (CENTERED)
-    col1, col2, col3 = st.columns([1, 2, 1])
+    st.title("📄 Applicant Summary")
+
+    col1, col2, col3 = st.columns([1,2,1])
     with col2:
         st.image(
             "https://media.assettype.com/gulfnews%2Fimport%2F2023%2F02%2F07%2FStock-Bank-Loan_1862a8288fe_large.jpg?w=640&auto=format%2Ccompress&fit=max",
-            width=450
+            width=420
         )
 
     if "user_data" not in st.session_state:
-        st.warning("⚠️ Please fill the Applicant Form and Predict Loan first.")
+        st.warning("⚠️ Please fill the Applicant Form first.")
     else:
         user = st.session_state.user_data
         result = st.session_state.result
@@ -179,25 +191,20 @@ if page == "Summary":
         st.table(pd.DataFrame(user.items(), columns=["Field", "Value"]))
 
         if result == "Approved":
-            st.markdown(
-                "<div class='badge-success'>🎉 Loan Approved</div>",
-                unsafe_allow_html=True
-            )
+            st.markdown("<div class='badge-success'>🎉 Loan Approved</div>", unsafe_allow_html=True)
         else:
-            st.markdown(
-                "<div class='badge-danger'>❌ Loan Rejected</div>",
-                unsafe_allow_html=True
-            )
+            st.markdown("<div class='badge-danger'>❌ Loan Rejected</div>", unsafe_allow_html=True)
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-# ---------------------------------------------------
-# PAGE 3: ANALYTICS
-# ---------------------------------------------------
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ===================================================
+# PAGE 3: ANALYTICS (NO BACKGROUND)
+# ===================================================
 if page == "Analytics":
 
     st.title("📊 Loan Approval Analysis")
-    st.progress(100)
 
     col1, col2, col3 = st.columns(3)
 
@@ -225,5 +232,3 @@ if page == "Analytics":
 
     st.subheader("📄 Raw Loan Dataset")
     st.dataframe(df, use_container_width=True)
-
-
