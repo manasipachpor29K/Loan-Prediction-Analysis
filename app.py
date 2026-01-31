@@ -17,9 +17,6 @@ st.set_page_config(
 # ---------------------------------------------------
 st.markdown("""
 <style>
-.main {
-    background-color: #f5f7fb;
-}
 .card {
     background-color: white;
     padding: 25px;
@@ -59,32 +56,33 @@ st.markdown("""
 @st.cache_data
 def load_data():
     df = pd.read_csv("LP_Train.csv")
-
-    df['Dependents'] = df['Dependents'].replace(r'\+', '', regex=True)
-    df['Dependents'] = df['Dependents'].fillna(0).astype(int)
-
-    df['Gender'] = df['Gender'].fillna('Male')
-    df['Married'] = df['Married'].fillna('Yes')
-
-    df['LoanAmount'] = df['LoanAmount'].fillna(df['LoanAmount'].mean())
-    df['Credit_History'] = df['Credit_History'].fillna(1.0)
-
     df['Loan_Status'] = df['Loan_Status'].map({'Y': 1, 'N': 0})
     return df
 
 df = load_data()
 
 # ---------------------------------------------------
-# SIMPLE PREDICTION LOGIC
+# EMI CALCULATION
 # ---------------------------------------------------
-def predict_loan(credit_history, income, loan_amount):
-    if credit_history == 1.0 and income > loan_amount:
-        return "Approved"
-    else:
-        return "Rejected"
+def calculate_emi(loan, annual_rate=10, years=20):
+    r = annual_rate / (12 * 100)
+    n = years * 12
+    emi = (loan * r * (1 + r) ** n) / ((1 + r) ** n - 1)
+    return emi
 
 # ---------------------------------------------------
-# SIDEBAR NAVIGATION
+# LOAN PREDICTION (REALISTIC LOGIC)
+# ---------------------------------------------------
+def predict_loan(credit_history, monthly_income, loan_amount):
+    emi = calculate_emi(loan_amount)
+
+    if credit_history == 1.0 and emi <= monthly_income * 0.4:
+        return "Approved", emi
+    else:
+        return "Rejected", emi
+
+# ---------------------------------------------------
+# SIDEBAR
 # ---------------------------------------------------
 st.sidebar.title("🏦 Loan Dashboard")
 page = st.sidebar.radio(
@@ -104,48 +102,42 @@ if page == "Applicant Form":
 
     with col1:
         name = st.text_input("Applicant Name")
-        gender = st.selectbox("Gender", df['Gender'].unique())
-        education = st.selectbox("Education", df['Education'].unique())
         credit_history = st.selectbox("Credit History", [1.0, 0.0])
+        monthly_income = st.number_input("Monthly Income (₹)", min_value=0)
 
     with col2:
-        married = st.selectbox("Married", df['Married'].unique())
+        loan_amount = st.number_input("Loan Amount (₹)", min_value=0)
         dependents = st.number_input("Dependents", 0, 5)
-        applicant_income = st.number_input("Applicant Income", min_value=0)
-        loan_amount = st.number_input("Loan Amount", min_value=0)
 
     if st.button("🔍 Predict Loan"):
 
-        if name.strip() == "" or applicant_income == 0 or loan_amount == 0:
+        if name.strip() == "" or monthly_income == 0 or loan_amount == 0:
             st.warning("⚠️ Please !! Enter the Applicant Details ..")
-
         else:
+            result, emi = predict_loan(
+                credit_history, monthly_income, loan_amount
+            )
+
             st.session_state.user_data = {
                 "Name": name,
-                "Gender": gender,
-                "Education": education,
-                "Married": married,
-                "Dependents": dependents,
-                "Income": applicant_income,
+                "Monthly Income": monthly_income,
                 "Loan Amount": loan_amount,
-                "Credit History": credit_history
+                "Credit History": credit_history,
+                "EMI": round(emi, 2)
             }
-
-            result = predict_loan(credit_history, applicant_income, loan_amount)
             st.session_state.result = result
+
+            st.markdown("<div class='card'>", unsafe_allow_html=True)
+            st.write(f"💰 **Estimated EMI:** ₹{emi:,.2f}")
 
             if result == "Approved":
                 st.success("🎉 Loan Approved")
+                st.write("✅ EMI is within 40% of your monthly income")
             else:
                 st.error("❌ Loan Rejected")
-                with st.expander("💡 Tips to Improve Loan Approval"):
-                    st.markdown("""
-                    ✅ Improve your credit score  
-                    ✅ Reduce loan amount  
-                    ✅ Increase income or add co-applicant  
-                    ✅ Clear existing EMIs  
-                    ✅ Maintain stable job
-                    """)
+                st.write("❌ EMI exceeds 40% of your monthly income")
+
+            st.markdown("</div>", unsafe_allow_html=True)
 
 # ---------------------------------------------------
 # PAGE 2: SUMMARY
@@ -156,7 +148,7 @@ if page == "Summary":
     st.progress(66)
 
     if "user_data" not in st.session_state:
-        st.warning("⚠️ Please fill the Applicant Form and Predict Loan first.")
+        st.warning("⚠️ Please fill the Applicant Form first.")
     else:
         user = st.session_state.user_data
         result = st.session_state.result
@@ -192,22 +184,13 @@ if page == "Analytics":
         unsafe_allow_html=True
     )
     col2.markdown(
-        f"<div class='metric-card'>Average Loan<br><h2>{df.LoanAmount.mean():.0f}</h2></div>",
-        unsafe_allow_html=True
-    )
-    col3.markdown(
         f"<div class='metric-card'>Applicants<br><h2>{len(df)}</h2></div>",
         unsafe_allow_html=True
     )
+    col3.markdown(
+        f"<div class='metric-card'>Avg Loan<br><h2>{df['LoanAmount'].mean():.0f}</h2></div>",
+        unsafe_allow_html=True
+    )
 
-    fig1 = px.bar(df, x="Gender", y="Loan_Status", title="Approval by Gender", color="Gender")
-    st.plotly_chart(fig1, use_container_width=True)
-
-    fig2 = px.bar(df, x="Education", y="Loan_Status", title="Approval by Education", color="Education")
-    st.plotly_chart(fig2, use_container_width=True)
-
-    fig3 = px.bar(df, x="Property_Area", y="Loan_Status", title="Approval by Property Area", color="Property_Area")
-    st.plotly_chart(fig3, use_container_width=True)
-
-    st.subheader("📄 Raw Loan Dataset")
-    st.dataframe(df, use_container_width=True)
+    fig = px.bar(df, x="Education", y="Loan_Status", title="Approval by Education")
+    st.plotly_chart(fig, use_container_width=True)
