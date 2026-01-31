@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -71,15 +70,13 @@ def calculate_emi(loan, annual_rate=10, years=20):
     return emi
 
 # ---------------------------------------------------
-# LOAN PREDICTION (REALISTIC LOGIC)
+# LOAN PREDICTION LOGIC
 # ---------------------------------------------------
 def predict_loan(credit_history, monthly_income, loan_amount):
     emi = calculate_emi(loan_amount)
-
     if credit_history == 1.0 and emi <= monthly_income * 0.4:
         return "Approved", emi
-    else:
-        return "Rejected", emi
+    return "Rejected", emi
 
 # ---------------------------------------------------
 # SIDEBAR
@@ -95,7 +92,9 @@ page = st.sidebar.radio(
 # ---------------------------------------------------
 if page == "Applicant Form":
 
+    # ✅ HEADLINE RESTORED
     st.title("Loan Approval Prediction Analysis")
+    st.subheader("Enter applicant details to check loan eligibility")
     st.progress(33)
 
     col1, col2 = st.columns(2)
@@ -123,7 +122,7 @@ if page == "Applicant Form":
                 "Monthly Income": monthly_income,
                 "Loan Amount": loan_amount,
                 "Credit History": credit_history,
-                "EMI": round(emi, 2)
+                "Estimated EMI": round(emi, 2)
             }
             st.session_state.result = result
 
@@ -132,10 +131,10 @@ if page == "Applicant Form":
 
             if result == "Approved":
                 st.success("🎉 Loan Approved")
-                st.write("✅ EMI is within 40% of your monthly income")
+                st.write("✅ EMI is within 40% of monthly income")
             else:
                 st.error("❌ Loan Rejected")
-                st.write("❌ EMI exceeds 40% of your monthly income")
+                st.write("❌ EMI exceeds 40% of monthly income")
 
             st.markdown("</div>", unsafe_allow_html=True)
 
@@ -194,3 +193,6 @@ if page == "Analytics":
 
     fig = px.bar(df, x="Education", y="Loan_Status", title="Approval by Education")
     st.plotly_chart(fig, use_container_width=True)
+
+
+
