@@ -11,7 +11,7 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-/* FULL PAGE BACKGROUND */
+/* FULL PAGE BACKGROUND WITH BLUR */
 body::before {
     content: "";
     position: fixed;
@@ -23,10 +23,11 @@ body::before {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    filter: blur(5px); /* Add blur */
     z-index: -2;
 }
 
-/* DARK OVERLAY */
+/* DARK OVERLAY TO MAKE TEXT READABLE */
 body::after {
     content: "";
     position: fixed;
@@ -34,16 +35,16 @@ body::after {
     left: 0;
     height: 100%;
     width: 100%;
-    background-color: rgba(0,0,0,0.45);
+    background-color: rgba(0,0,0,0.45); /* Adjust darkness for readability */
     z-index: -1;
 }
 
 /* WHITE CARD */
 .card {
-    background-color: rgba(255,255,255,0.96);
+    background-color: rgba(255,255,255,0.95); /* Slightly transparent for soft look */
     padding: 25px;
     border-radius: 15px;
-    box-shadow: 0px 8px 25px rgba(0,0,0,0.25);
+    box-shadow: 0px 8px 25px rgba(0,0,0,0.3);
     margin-bottom: 25px;
 }
 
@@ -67,8 +68,20 @@ body::after {
     font-size: 18px;
 }
 
+/* CARD HEADINGS */
+h1, h2, h3, h4, h5, h6 {
+    color: #000000; /* Dark headings for cards */
+}
+
+/* TEXT INPUTS & SELECTBOXES */
+.stTextInput>div>div>input, .stSelectbox>div>div>div>select, .stNumberInput>div>div>input {
+    background-color: rgba(255,255,255,0.95); /* Inputs readable */
+    color: #000;
+}
+
 </style>
 """, unsafe_allow_html=True)
+
 
 # ---------------- SIDEBAR ----------------
 st.sidebar.title("🏦 Loan Dashboard")
