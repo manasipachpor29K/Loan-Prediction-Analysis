@@ -1,115 +1,101 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
 
-# ---------------------------------------------------
-# PAGE CONFIG
-# ---------------------------------------------------
+# ---------------- PAGE CONFIG ----------------
 st.set_page_config(
     page_title="Loan Approval Prediction Analysis",
-    page_icon="🏦",
     layout="wide"
 )
 
-# ---------------------------------------------------
-# GLOBAL CSS
-# ---------------------------------------------------
+# ---------------- CSS ----------------
 st.markdown("""
 <style>
-.main {
-    background-color: #f5f7fb;
+
+/* FULL PAGE BACKGROUND */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-image: url("https://t4.ftcdn.net/jpg/16/97/54/69/360_F_1697546950_YG9PdzRMoRv2owtMUU7T6o0Des5fPAws.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -2;
 }
+
+/* DARK OVERLAY */
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0,0,0,0.45);
+    z-index: -1;
+}
+
+/* WHITE CARD */
 .card {
-    background-color: rgba(255,255,255,0.92);
+    background-color: rgba(255,255,255,0.96);
     padding: 25px;
     border-radius: 15px;
-    box-shadow: 0px 6px 20px rgba(0,0,0,0.15);
-    margin-bottom: 20px;
+    box-shadow: 0px 8px 25px rgba(0,0,0,0.25);
+    margin-bottom: 25px;
 }
-.metric-card {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    padding: 20px;
-    border-radius: 15px;
-    color: white;
-    text-align: center;
-}
+
+/* BADGES */
 .badge-success {
     background-color: #d4edda;
     color: #155724;
-    padding: 12px;
+    padding: 15px;
     border-radius: 12px;
     font-weight: bold;
     text-align: center;
+    font-size: 18px;
 }
 .badge-danger {
     background-color: #f8d7da;
     color: #721c24;
-    padding: 12px;
+    padding: 15px;
     border-radius: 12px;
     font-weight: bold;
     text-align: center;
+    font-size: 18px;
 }
 
-/* 🔹 Background Image for Page 1 & 2 */
-.bg-page {
-    background-image: url("https://t4.ftcdn.net/jpg/16/97/54/69/360_F_1697546950_YG9PdzRMoRv2owtMUU7T6o0Des5fPAws.jpg");
-    background-size: cover;
-    background-position: center;
-    padding: 30px;
-    border-radius: 20px;
-}
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------------------------------------------
-# LOAD DATA
-# ---------------------------------------------------
-@st.cache_data
-def load_data():
-    df = pd.read_csv("LP_Train.csv")
-
-    df['Dependents'] = df['Dependents'].replace(r'\+', '', regex=True)
-    df['Dependents'] = df['Dependents'].fillna(0).astype(int)
-
-    df['Gender'] = df['Gender'].fillna('Male')
-    df['Married'] = df['Married'].fillna('Yes')
-
-    df['LoanAmount'] = df['LoanAmount'].fillna(df['LoanAmount'].mean())
-    df['Credit_History'] = df['Credit_History'].fillna(1.0)
-
-    df['Loan_Status'] = df['Loan_Status'].map({'Y': 1, 'N': 0})
-    return df
-
-df = load_data()
-
-# ---------------------------------------------------
-# SIMPLE PREDICTION LOGIC
-# ---------------------------------------------------
-def predict_loan(credit_history, income, loan_amount):
-    if credit_history == 1.0 and income > loan_amount:
-        return "Approved"
-    else:
-        return "Rejected"
-
-# ---------------------------------------------------
-# SIDEBAR NAVIGATION
-# ---------------------------------------------------
+# ---------------- SIDEBAR ----------------
 st.sidebar.title("🏦 Loan Dashboard")
 page = st.sidebar.radio(
     "Navigation",
     ["Applicant Form", "Summary", "Analytics"]
 )
 
-# ===================================================
-# PAGE 1: APPLICANT FORM (WITH BACKGROUND)
-# ===================================================
-if page == "Applicant Form":
+# ---------------- DUMMY DATA ----------------
+df = pd.DataFrame({
+    "Gender": ["Male", "Female"],
+    "Married": ["Yes", "No"]
+})
 
-    st.markdown("<div class='bg-page'>", unsafe_allow_html=True)
+# ---------------- PREDICTION LOGIC ----------------
+def predict_loan(credit_history, income, loan):
+    if credit_history == 1 and income > 5000 and loan < income * 2:
+        return "Approved"
+    else:
+        return "Rejected"
+
+# ---------------- PAGE 1 ----------------
+if page == "Applicant Form":
 
     st.title("Loan Approval Prediction Analysis")
 
-    # Center image
+    # CENTER IMAGE
     col1, col2, col3 = st.columns([1,2,1])
     with col2:
         st.image(
@@ -118,117 +104,49 @@ if page == "Applicant Form":
         )
 
     st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.progress(33)
 
     col1, col2 = st.columns(2)
 
     with col1:
         name = st.text_input("Applicant Name")
-        gender = st.selectbox("Gender", df['Gender'].unique())
-        education = st.selectbox("Education", df['Education'].unique())
-        credit_history = st.selectbox("Credit History", [1.0, 0.0])
+        gender = st.selectbox("Gender", df["Gender"])
+        credit_history = st.selectbox("Credit History", [1, 0])
 
     with col2:
-        married = st.selectbox("Married", df['Married'].unique())
-        dependents = st.number_input("Dependents", 0, 5)
-        applicant_income = st.number_input("Applicant Income", min_value=0)
-        loan_amount = st.number_input("Loan Amount", min_value=0)
+        married = st.selectbox("Married", df["Married"])
+        income = st.number_input("Applicant Income", min_value=0)
+        loan = st.number_input("Loan Amount", min_value=0)
 
     if st.button("🔍 Predict Loan"):
-        st.session_state.user_data = {
-            "Name": name,
-            "Gender": gender,
-            "Education": education,
-            "Married": married,
-            "Dependents": dependents,
-            "Income": applicant_income,
-            "Loan Amount": loan_amount,
-            "Credit History": credit_history
-        }
-
-        result = predict_loan(credit_history, applicant_income, loan_amount)
+        result = predict_loan(credit_history, income, loan)
         st.session_state.result = result
 
         if result == "Approved":
             st.success("🎉 Loan Approved")
         else:
             st.error("❌ Loan Rejected")
-            with st.expander("💡 Tips to Improve Loan Approval"):
-                st.markdown("""
-                ✅ Improve credit score  
-                ✅ Reduce loan amount  
-                ✅ Increase income or add co-applicant  
-                ✅ Clear existing EMIs  
-                ✅ Stable employment
-                """)
+            st.info("""
+            **Tips to Improve Approval:**
+            - Maintain good credit history  
+            - Increase monthly income  
+            - Reduce loan amount  
+            - Avoid multiple loan applications
+            """)
 
     st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
 
-# ===================================================
-# PAGE 2: SUMMARY (WITH BACKGROUND)
-# ===================================================
-if page == "Summary":
+# ---------------- PAGE 2 ----------------
+elif page == "Summary":
 
-    st.markdown("<div class='bg-page'>", unsafe_allow_html=True)
-
-    st.title("📄 Applicant Summary")
+    st.title("📄 Loan Summary")
 
     col1, col2, col3 = st.columns([1,2,1])
     with col2:
         st.image(
-            "https://media.assettype.com/gulfnews%2Fimport%2F2023%2F02%2F07%2FStock-Bank-Loan_1862a8288fe_large.jpg?w=640&auto=format%2Ccompress&fit=max",
+            "https://media.assettype.com/gulfnews%2Fimport%2F2023%2F02%2F07%2FStock-Bank-Loan_1862a8288fe_large.jpg",
             width=420
         )
 
-    if "user_data" not in st.session_state:
-        st.warning("⚠️ Please fill the Applicant Form first.")
-    else:
-        user = st.session_state.user_data
-        result = st.session_state.result
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
 
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.table(pd.DataFrame(user.items(), columns=["Field", "Value"]))
-
-        if result == "Approved":
-            st.markdown("<div class='badge-success'>🎉 Loan Approved</div>", unsafe_allow_html=True)
-        else:
-            st.markdown("<div class='badge-danger'>❌ Loan Rejected</div>", unsafe_allow_html=True)
-
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# ===================================================
-# PAGE 3: ANALYTICS (NO BACKGROUND)
-# ===================================================
-if page == "Analytics":
-
-    st.title("📊 Loan Approval Analysis")
-
-    col1, col2, col3 = st.columns(3)
-
-    col1.markdown(
-        f"<div class='metric-card'>Approval Rate<br><h2>{df.Loan_Status.mean()*100:.1f}%</h2></div>",
-        unsafe_allow_html=True
-    )
-    col2.markdown(
-        f"<div class='metric-card'>Average Loan<br><h2>{df.LoanAmount.mean():.0f}</h2></div>",
-        unsafe_allow_html=True
-    )
-    col3.markdown(
-        f"<div class='metric-card'>Applicants<br><h2>{len(df)}</h2></div>",
-        unsafe_allow_html=True
-    )
-
-    fig1 = px.bar(df, x="Gender", y="Loan_Status", title="Approval by Gender", color="Gender")
-    st.plotly_chart(fig1, use_container_width=True)
-
-    fig2 = px.bar(df, x="Education", y="Loan_Status", title="Approval by Education", color="Education")
-    st.plotly_chart(fig2, use_container_width=True)
-
-    fig3 = px.bar(df, x="Property_Area", y="Loan_Status", title="Approval by Property Area", color="Property_Area")
-    st.plotly_chart(fig3, use_container_width=True)
-
-    st.subheader("📄 Raw Loan Dataset")
-    st.dataframe(df, use_container_width=True)
+    if "result" i
