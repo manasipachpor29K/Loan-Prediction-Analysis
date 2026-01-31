@@ -101,12 +101,15 @@ if page == "Applicant Form":
 
     with col1:
         name = st.text_input("Applicant Name")
+        gender = st.selectbox("Gender", ["Male", "Female"])
+        education = st.selectbox("Education", ["Graduate", "Not Graduate"])
         credit_history = st.selectbox("Credit History", [1.0, 0.0])
         monthly_income = st.number_input("Monthly Income (₹)", min_value=0)
 
     with col2:
-        loan_amount = st.number_input("Loan Amount (₹)", min_value=0)
+        married = st.selectbox("Married", ["Yes", "No"])
         dependents = st.number_input("Dependents", 0, 5)
+        loan_amount = st.number_input("Loan Amount (₹)", min_value=0)
 
     if st.button("🔍 Predict Loan"):
 
@@ -119,7 +122,11 @@ if page == "Applicant Form":
 
             st.session_state.user_data = {
                 "Name": name,
-                "Monthly Income": monthly_income,
+                "Gender": gender,
+                "Education": education,
+                "Married": married,
+                "Dependents": dependents,
+                "Income": monthly_income,
                 "Loan Amount": loan_amount,
                 "Credit History": credit_history,
                 "Estimated EMI": round(emi, 2)
@@ -166,33 +173,4 @@ if page == "Summary":
                 unsafe_allow_html=True
             )
 
-        st.markdown("</div>", unsafe_allow_html=True)
-
-# ---------------------------------------------------
-# PAGE 3: ANALYTICS
-# ---------------------------------------------------
-if page == "Analytics":
-
-    st.title("📊 Loan Approval Analysis")
-    st.progress(100)
-
-    col1, col2, col3 = st.columns(3)
-
-    col1.markdown(
-        f"<div class='metric-card'>Approval Rate<br><h2>{df.Loan_Status.mean()*100:.1f}%</h2></div>",
-        unsafe_allow_html=True
-    )
-    col2.markdown(
-        f"<div class='metric-card'>Applicants<br><h2>{len(df)}</h2></div>",
-        unsafe_allow_html=True
-    )
-    col3.markdown(
-        f"<div class='metric-card'>Avg Loan<br><h2>{df['LoanAmount'].mean():.0f}</h2></div>",
-        unsafe_allow_html=True
-    )
-
-    fig = px.bar(df, x="Education", y="Loan_Status", title="Approval by Education")
-    st.plotly_chart(fig, use_container_width=True)
-
-
-
+        st.markdown("</div>", uns
