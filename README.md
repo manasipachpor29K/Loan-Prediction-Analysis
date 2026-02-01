@@ -1,8 +1,8 @@
-# LP_Train
-Introduction
+# Loan Approval Prediction Analysis
+# Introduction
 In this project, I worked on a loan approval dataset to understand how banks decide whether a person’s loan should be approved or rejected. The dataset contains information like applicant income, loan amount, credit history, education, marital status, property area, etc. The main purpose of this project was to study the dataset properly, find useful patterns, and understand which factors affect loan approval the most.
 
-What I did in this project (Step-by-Step)
+# What I did in this project (Step-by-Step)
 1. Checking and Handling Missing Values
 First, I loaded the dataset and checked if there were any missing values. I used isnull().sum() to see which columns had null values. I found missing values in columns like:
 
@@ -36,7 +36,7 @@ For loan term, most people had a loan term of 360 months, and approvals were als
 5. Property Area Analysis
 Finally, I checked how property area affects loan approval. The dataset had: Urban Semiurban Rural
 
-From analysis:
+# From analysis:
 
 Semiurban area had the highest loan approval rate. Urban was in the middle. Rural area had comparatively lower approvals. This shows that location also affects loan approval chances.
 
