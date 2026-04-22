@@ -64,10 +64,7 @@ df = load_data()
 # EMI CALCULATION
 # ---------------------------------------------------
 def calculate_emi(loan, annual_rate=10, years=20):
-    r = annual_rate / (12 * 100
-    n = years * 12
-    emi = (loan * r * (1 + r) ** n) / ((1 + r) ** n - 1
-    return emi
+   
 
 # ---------------------------------------------------
 # LOAN PREDICTION LOGIC
